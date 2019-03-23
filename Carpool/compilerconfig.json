@@ -2,5 +2,13 @@
   {
     "outputFile": "css/index.css",
     "inputFile": "css/index.less"
+  },
+  {
+    "outputFile": "css/register.css",
+    "inputFile": "css/register.less"
+  },
+  {
+    "outputFile": "css/user.css",
+    "inputFile": "css/user.less"
   }
 ]

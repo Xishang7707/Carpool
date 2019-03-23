@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carpool", "Carpool\Carpool.csproj", "{E9CFDCF3-970C-44EE-8767-72D578B0DAE5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{3E486B67-D84D-4707-8AB5-D53B3D92CD37}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{E9CFDCF3-970C-44EE-8767-72D578B0DAE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9CFDCF3-970C-44EE-8767-72D578B0DAE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9CFDCF3-970C-44EE-8767-72D578B0DAE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E486B67-D84D-4707-8AB5-D53B3D92CD37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E486B67-D84D-4707-8AB5-D53B3D92CD37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E486B67-D84D-4707-8AB5-D53B3D92CD37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E486B67-D84D-4707-8AB5-D53B3D92CD37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

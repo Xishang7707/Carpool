@@ -5,14 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Carpool 拼车网</title>
     <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <!--<link href="css/foundation.min.css" rel="stylesheet" />-->
+    <link href="css/foundation-datepicker.min.css" rel="stylesheet" />
+    <link href="css/build.css" rel="stylesheet" />
+    <link href="css/zico.min.css" rel="stylesheet" />
+
     <link href="css/index.min.css" rel="stylesheet" />
     <script src="Script/jquery-3.2.1.min.js"></script>
     <script src="Script/bootstrap.min.js"></script>
     <!--<script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>-->
     <script src="Script/jquery.cookie-1.4.1.min.js"></script>
     <script src="Script/vue.js"></script>
-    <style>
-    </style>
+
+    <script src="Script/foundation-datepicker.min.js"></script>
+    <script src="Script/global.js"></script>
+    <script src="Script/index.js"></script>
+    <script src="Script/login.js"></script>
+
 </head>
 <body>
     <!-- 第一页 -->
@@ -28,19 +37,30 @@
                         <a class="nav-link text-light" href="index.html">首页</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-light" href="#">打车</a>
+                        <a class="nav-link text-light" href="index.html#page-2">打车</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-light" href="#">拉客</a>
+                        <a class="nav-link text-light" href="index.html#page-3">拉客</a>
+                    </li>
+                    <li class="nav-item nav-login">
+                        <a class="nav-link text-light" data-target="#Login_dialog">登陆</a>
+                    </li>
+                    <li class="nav-item nav-login">
+                        <a class="nav-link text-light" href="register.html">注册</a>
+                    </li>
+                    <li class="nav-item dropdown mr-5 d-none user-menu">
+
+                        <a class="nav-link dropdown-toggle text-light user-info-name" data-display="static" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"></a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="user.html">个人中心</a>
+                            <a class="dropdown-item" href="#">消息</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" data-target="#Login_dialog">切换用户</a>
+                            <a class="dropdown-item" data-target='Login_logout'>登出</a>
+                        </div>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-light" href="#">关于</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" href="#">登陆</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" href="#">注册</a>
                     </li>
                 </ul>
             </div>
@@ -52,33 +72,124 @@
                     <h3 class="text-white text-center">爱上拼车生活</h3>
                     <br />
                     <div class="row">
-                        <a class="col-sm-5 btn nav-link btn-outline-white btn-lg mr-sm-auto" href="#">打车</a>
-                        <a class="col-sm-5 btn nav-link btn-outline-white btn-lg ml-sm-auto" href="#">拉客</a>
+                        <a class="col-sm-5 btn nav-link btn-outline-white btn-lg mr-sm-auto" href="#page-2">打车</a>
+                        <a class="col-sm-5 btn nav-link btn-outline-white btn-lg ml-sm-auto" href="#page-3">拉客</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <!-- 第二页 -->
-    <div class="container page pt-3 pb-5">
+    <a name="page-2"></a>
+    <div class="container page page-2 pt-3">
         <h2 class="text-center m-5">打车</h2>
         <ul class="nav nav-pills nav-justified">
             <li class="nav-item">
-                <a class="nav-link  btn-lg active" href="#custome-work" data-toggle="pill">上下班</a>
+                <!-- 车主订单列表 -->
+                <a class="nav-link  btn-lg active" href="#customer-list" data-toggle="pill">打车</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link  btn-lg" href="#custome-longtrip" data-toggle="pill">长途</a>
+                <a class="nav-link  btn-lg" href="#customer-work" data-toggle="pill">上下班</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link  btn-lg" href="#customer-long" data-toggle="pill">长途</a>
             </li>
         </ul>
         <div class="tab-content">
-            <div id="custome-work" class="container tab-pane active fade show">
-                <div class="row mt-4">
+            <div id="customer-list" class="container tab-pane fade active show mt-3">
+                <div class="container">
+                    <div class="row">
+
+                        <div class="col-md-5">
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">起点</span>
+                                </div>
+                                <input type="text" class="form-control startplace" maxlength="7" />
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">终点</span>
+                                </div>
+                                <input type="text" class="form-control endplace" maxlength="7" />
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" v-on:click="btn_search" class="btn btn-primary btn-block">搜索</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- 信息表 -->
+                <div class="mt-3">
+                    <div class="row border pt-3 pb-3">
+                        <div class="col-5 font-weight-bold">
+                            信息
+                        </div>
+                        <div class="col-3 p-0 font-weight-bold text-center">
+                            价格
+                        </div>
+                        <div class="col-4 font-weight-bold text-center">
+                            出发时间
+                        </div>
+                    </div>
+                    <div v-for="item in customer_list" class="row border pt-3 pb-3 border-top-0 list-item">
+                        <div class="col-5">
+                            <div class="row">
+                                <div class="col">
+                                    <span class="font-weight-bold">路线：</span>
+                                    <a class="text-primary" style="cursor:pointer">{{item['startplace']}}<i class="zi zi_longarrowaltright pl-3 pr-3" zico="箭头指示向右"></i>{{item['endplace']}}</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <span class="font-weight-bold">途径：</span>
+                                    <span class="small">{{item['way']}}</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <span class="font-weight-bold">备注：</span>
+                                    <span class="small">{{item['remarks']}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-if="item['paytype']==0" class="col-3 p-0 text-center">
+                            免费
+                        </div>
+                        <div v-else-if="item['paytype']==1" class="col-3 p-0 text-center">
+                            面议
+                        </div>
+                        <div v-else-if="item['paytype']==2" class="col-3 p-0 text-center">
+                            ¥{{item['price']}}
+                        </div>
+                        <div class="col-4 text-center">
+                            {{format_date(item['time'], 'yyyy年MM月dd日 hh:mm')}}
+                        </div>
+                    </div>
+                    <!-- 页码 -->
+                    <div class="container p-2" v-if="searchcondition['pages']!=0">
+                        <nav aria-label="navigation">
+                            <ul class="pagination d-flex flex-wrap justify-content-center">
+                                <li class="page-item" v-bind:class="{'disabled':searchcondition['curpage']==1}"><button class="page-link" v-on:click="page_prev">上一页</button></li>
+                                <li class="page-item" v-for="index in (searchcondition['pages'])" v-bind:class="{'active':index==searchcondition['curpage']}"><button v-on:click="page_number_search(index)" class="page-link">{{index}}</button></li>
+                                <li class="page-item" v-bind:class="{'disabled':searchcondition['curpage']==searchcondition['pages']}"><button class="page-link" v-on:click="page_next">下一页</button></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 上下班 -->
+            <div id="customer-work" class="container tab-pane fade">
+                <div class="row mt-3">
                     <div class="col-md-6">
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">起</span>
                             </div>
-                            <input type="text" class="form-control startplace" placeholder="起点">
+                            <input type="text" class="form-control startplace" v-model="startplace" maxlength="7" placeholder="起点">
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -86,29 +197,344 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">终</span>
                             </div>
-                            <input type="text" class="form-control endplace" placeholder="终点">
+                            <input type="text" class="form-control endplace" v-model="endplace" maxlength="7" placeholder="终点">
                         </div>
                     </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">时</span>
+                            </div>
+                            <input type="text" class="form-control starttime" placeholder="出发时间">
+                        </div>
+                    </div>
+                    <div class="col-md-6 d-flex">
+                        <select name="custome-work-paytype" class="custom-select custom-control-inline paytype" v-model="paytype">
+                            <option value="-1">---支付方式---</option>
+                            <option value="0">免费</option>
+                            <option value="1">面议</option>
+                            <option value="2">一口价</option>
+                        </select>
+                        <input type="text" class="form-control p-2 flex-fill price" maxlength="5" v-model="price" placeholder="元/位" />
+                        <!--</div>-->
+                    </div>
+                </div>
+                <div class="row mt-3 way">
                     <div class="col-12">
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">经</span>
                             </div>
-                            <input type="text" class="form-control way" placeholder="途径">
+                            <input type="text" class="form-control way" maxlength="7" placeholder="途径(可选,最多5个)">
                             <div class="input-group-append">
-                                <button class="btn btn-primary" type="submit">添加</button>
+                                <button class="btn btn-primary" v-on:click="addway" type="submit">添加</button>
                             </div>
                         </div>
                     </div>
                 </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">备注</span>
+                            </div>
+                            <textarea maxlength="100" class="form-control remarks" placeholder="最多100个字" v-model="remarks" aria-label="备注"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3 publish">
+                    <div class="col-12 d-flex">
+                        <button v-on:click="publish" class="p-2 flex-fill btn btn-primary btn-lg publish">发布</button>
+                    </div>
+                </div>
             </div>
-            <div id="custome-longtrip" class="container tab-pane fade">
-                156154353456
+            <!-- 长途 -->
+            <div id="customer-long" class="container tab-pane fade">
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">起</span>
+                            </div>
+                            <input type="text" class="form-control startplace" v-model="startplace" maxlength="7" placeholder="起点">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">终</span>
+                            </div>
+                            <input type="text" class="form-control endplace" v-model="endplace" maxlength="7" placeholder="终点">
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">时</span>
+                            </div>
+                            <input type="text" class="form-control starttime" placeholder="出发时间">
+                        </div>
+                    </div>
+                    <div class="col-md-6 d-flex">
+                        <select name="customer-long-paytype" v-model="paytype" class="custom-select custom-control-inline paytype">
+                            <option value="-1">---支付方式---</option>
+                            <option value="0">免费</option>
+                            <option value="1">面议</option>
+                            <option value="2">一口价</option>
+                        </select>
+                        <input type="text" class="form-control p-2 flex-fill price" v-model="price" maxlength="5" placeholder="元/位" />
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">备注</span>
+                            </div>
+                            <textarea maxlength="100" v-model="remarks" class="form-control remarks" placeholder="最多100个字" aria-label="备注"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12 d-flex">
+                        <button v-on:click="publish" class="p-2 flex-fill btn btn-primary btn-lg publish">发布</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <!--<script>
-        $(".tab-content .fade:first").show();
-    </script>-->
+    <!-- 第三页 -->
+    <a name="page-3"></a>
+    <div class="container page page-3 pt-3 pb-5">
+        <h2 class="text-center m-5">拉客</h2>
+        <ul class="nav nav-pills nav-justified">
+            <li class="nav-item">
+                <!-- 乘客订单列表 -->
+                <a class="nav-link  btn-lg active" href="#driver-list" data-toggle="pill">拉客</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link  btn-lg" href="#driver-work" data-toggle="pill">上下班</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link  btn-lg" href="#driver-long" data-toggle="pill">长途</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div id="driver-list" class="container tab-pane fade active show mt-3">
+                <div class="container">
+                    <div class="row">
+
+                        <div class="col-md-5">
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">起点</span>
+                                </div>
+                                <input type="text" maxlength="7" class="form-control startplace" />
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">终点</span>
+                                </div>
+                                <input type="text" maxlength="7" class="form-control endplace" />
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" v-on:click="btn_search" class="btn btn-primary btn-block">搜索</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- 信息表 -->
+                <div class="mt-3">
+                    <div class="row border pt-3 pb-3">
+                        <div class="col-5 font-weight-bold">
+                            信息
+                        </div>
+                        <div class="col-3 p-0 font-weight-bold text-center">
+                            价格
+                        </div>
+                        <div class="col-4 font-weight-bold text-center">
+                            出发时间
+                        </div>
+                    </div>
+                    <div v-for="item in driver_list" class="row border pt-3 pb-3 border-top-0 list-item">
+                        <div class="col-5">
+                            <div class="row">
+                                <div class="col">
+                                    <span class="font-weight-bold">路线：</span>
+                                    <a class="text-primary" style="cursor:pointer">{{item['startplace']}}<i class="zi zi_longarrowaltright pl-3 pr-3" zico="箭头指示向右"></i>{{item['endplace']}}</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <span class="font-weight-bold">途径：</span>
+                                    <span class="small">{{item['way']}}</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <span class="font-weight-bold">备注：</span>
+                                    <span class="small">{{item['remarks']}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-if="item['paytype']==0" class="col-3 p-0 text-center">
+                            免费
+                        </div>
+                        <div v-else-if="item['paytype']==1" class="col-3 p-0 text-center">
+                            面议
+                        </div>
+                        <div v-else-if="item['paytype']==2" class="col-3 p-0 text-center">
+                            ¥{{item['price']}}
+                        </div>
+                        <div class="col-4 text-center">
+                            {{format_date(item['time'], 'yyyy年MM月dd日 hh:mm')}}
+                        </div>
+                    </div>
+                    <!-- 页码 -->
+                    <div class="container p-2" v-if="searchcondition['pages']!=0">
+                        <nav aria-label="navigation">
+                            <ul class="pagination d-flex flex-wrap justify-content-center">
+                                <li class="page-item" v-bind:class="{'disabled':searchcondition['curpage']==1}"><button class="page-link" v-on:click="page_prev">上一页</button></li>
+                                <li class="page-item" v-for="index in (searchcondition['pages'])" v-bind:class="{'active':index==searchcondition['curpage']}"><button v-on:click="page_number_search(index)" class="page-link">{{index}}</button></li>
+                                <!--<li class="page-item" v-for="index in (12-10>=5?5:12-10)" v-bind:class="{'active':index==searchcondition['curpage']}"><button v-on:click="page_number_search(index)" class="page-link">{{10+index}}</button></li>-->
+                                <li class="page-item" v-bind:class="{'disabled':searchcondition['curpage']==searchcondition['pages']}"><button class="page-link" v-on:click="page_next">下一页</button></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 上下班 -->
+            <div id="driver-work" class="container tab-pane fade">
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">起</span>
+                            </div>
+                            <input type="text" class="form-control startplace" v-model="startplace" maxlength="7" placeholder="起点">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">终</span>
+                            </div>
+                            <input type="text" class="form-control endplace" v-model="endplace" maxlength="7" placeholder="终点">
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">时</span>
+                            </div>
+                            <input type="text" class="form-control starttime" placeholder="出发时间">
+                        </div>
+                    </div>
+                    <div class="col-md-6 d-flex">
+                        <select name="custome-work-paytype" class="custom-select custom-control-inline paytype" v-model="paytype">
+                            <option value="-1">---支付方式---</option>
+                            <option value="0">免费</option>
+                            <option value="1">面议</option>
+                            <option value="2">一口价</option>
+                        </select>
+                        <input type="text" class="form-control p-2 flex-fill price" maxlength="5" v-model="price" placeholder="元/位" />
+                        <!--</div>-->
+                    </div>
+                </div>
+                <div class="row mt-3 way">
+                    <div class="col-12">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">经</span>
+                            </div>
+                            <input type="text" class="form-control way" maxlength="7" placeholder="途径(可选,最多5个)">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" v-on:click="addway" type="submit">添加</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">备注</span>
+                            </div>
+                            <textarea maxlength="100" class="form-control remarks" placeholder="最多100个字" v-model="remarks" aria-label="备注"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3 publish">
+                    <div class="col-12 d-flex">
+                        <button v-on:click="publish" class="p-2 flex-fill btn btn-primary btn-lg publish">发布</button>
+                    </div>
+                </div>
+            </div>
+            <!-- 长途 -->
+            <div id="driver-long" class="container tab-pane fade">
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">起</span>
+                            </div>
+                            <input type="text" class="form-control startplace" v-model="startplace" maxlength="7" placeholder="起点">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">终</span>
+                            </div>
+                            <input type="text" class="form-control endplace" v-model="endplace" maxlength="7" placeholder="终点">
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">时</span>
+                            </div>
+                            <input type="text" class="form-control starttime" placeholder="出发时间">
+                        </div>
+                    </div>
+                    <div class="col-md-6 d-flex">
+                        <select name="driver-long-paytype" v-model="paytype" class="custom-select custom-control-inline paytype">
+                            <option value="-1">---支付方式---</option>
+                            <option value="0">免费</option>
+                            <option value="1">面议</option>
+                            <option value="2">一口价</option>
+                        </select>
+                        <input type="text" class="form-control p-2 flex-fill price" maxlength="5" v-model="price" placeholder="元/位" />
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">备注</span>
+                            </div>
+                            <textarea maxlength="100" v-model="remarks" class="form-control remarks" placeholder="最多100个字" aria-label="备注"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12 d-flex">
+                        <button v-on:click="publish" class="p-2 flex-fill btn btn-primary btn-lg publish">发布</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

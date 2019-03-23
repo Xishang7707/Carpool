@@ -1,4 +1,7 @@
-﻿.btn.btn-outline-white {
+﻿a {
+  cursor: pointer !important;
+}
+.btn.btn-outline-white {
   color: #fff;
   background-color: transparent;
   background-image: none;

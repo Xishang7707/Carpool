@@ -68,22 +68,54 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="css\bootstrap.min.css" />
+    <Content Include="css\build.css" />
+    <Content Include="css\foundation-datepicker.min.css" />
     <Content Include="css\index.css">
       <DependentUpon>index.less</DependentUpon>
     </Content>
     <Content Include="css\index.min.css">
       <DependentUpon>index.css</DependentUpon>
     </Content>
+    <Content Include="css\register.css">
+      <DependentUpon>register.less</DependentUpon>
+    </Content>
+    <Content Include="css\register.min.css">
+      <DependentUpon>register.css</DependentUpon>
+    </Content>
+    <Content Include="css\user.css">
+      <DependentUpon>user.less</DependentUpon>
+    </Content>
+    <Content Include="css\user.min.css">
+      <DependentUpon>user.css</DependentUpon>
+    </Content>
+    <Content Include="css\zico.min.css" />
+    <Content Include="css\dist\fonts\zi-gov.svg" />
+    <Content Include="css\dist\fonts\zi-regular.svg" />
+    <Content Include="css\dist\fonts\zi-tm.svg" />
+    <Content Include="css\zico_gov.min.css" />
+    <Content Include="css\zico_tm.min.css" />
+    <Content Include="images\user-headprotrait\def_headportrait.png" />
     <Content Include="images\pic4.jpg" />
     <Content Include="images\bg.jpg" />
     <Content Include="images\pic1.jpg" />
     <Content Include="images\pic2.jpg" />
     <Content Include="images\pic3.jpg" />
     <Content Include="index.html" />
+    <Content Include="register.html" />
     <Content Include="Script\bootstrap.min.js" />
+    <Content Include="Script\dialog.js" />
+    <Content Include="Script\foundation-datepicker.min.js" />
+    <Content Include="Script\global.js" />
+    <Content Include="Script\index.js" />
     <Content Include="Script\jquery-3.2.1.min.js" />
     <Content Include="Script\jquery.cookie-1.4.1.min.js" />
+    <Content Include="Script\login.js" />
+    <Content Include="Script\popper.min.js" />
+    <Content Include="Script\register.js" />
+    <Content Include="Script\tooltip.min.js" />
+    <Content Include="Script\user.js" />
     <Content Include="Script\vue.js" />
+    <Content Include="user.html" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -95,6 +127,17 @@
     <None Include="compilerconfig.json.defaults">
       <DependentUpon>compilerconfig.json</DependentUpon>
     </None>
+    <Content Include="css\register.less" />
+    <Content Include="css\dist\fonts\zi-gov.eot" />
+    <Content Include="css\dist\fonts\zi-gov.ttf" />
+    <Content Include="css\dist\fonts\zi-gov.woff" />
+    <Content Include="css\dist\fonts\zi-regular.eot" />
+    <Content Include="css\dist\fonts\zi-regular.ttf" />
+    <Content Include="css\dist\fonts\zi-regular.woff" />
+    <Content Include="css\dist\fonts\zi-tm.eot" />
+    <Content Include="css\dist\fonts\zi-tm.ttf" />
+    <Content Include="css\dist\fonts\zi-tm.woff" />
+    <Content Include="css\user.less" />
     <None Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
