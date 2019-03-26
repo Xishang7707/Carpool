@@ -18,5 +18,24 @@ namespace API.DAL
                 return null;
             return JObject.FromObject(car_jarr[0]);
         }
+        public static bool Apply(string us_id, string carname, string caridcard, string capacity, string cartype)
+        {
+            string cmd = @"insert Car(us_id, car_name, car_idcard, car_type, capacity) 
+                            values(@us_id, @car_name, @car_idcard, @car_type, @capacity)";
+            bool result = DBHelper.Exec(cmd, "@us_id", us_id, "@car_name", carname, "@car_idcard", caridcard, "@car_type", cartype, "@capacity", capacity) > 0;
+            if (!result)
+                return false;
+            string cmd2 = @"update [User] set type=1 where id=@us_id";
+            result = DBHelper.Exec(cmd, "us_id", us_id) > 0;
+            return result;
+        }
+        public static bool Exist(string caridcard)
+        {
+            string cmd = @"select * from [Car] where car_idcard=@caridcard";
+            JArray car_jarr = DBHelper.GetData(cmd, "@caridcard", caridcard);
+            if (car_jarr.Count <= 0)
+                return false;
+            return true;
+        }
     }
 }

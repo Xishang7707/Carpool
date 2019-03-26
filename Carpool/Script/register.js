@@ -157,8 +157,7 @@
             verify_password: function (val) {
                 var password_reg = [/[a-zA-Z]+/, /\d+/, /^[^\u4e00-\u9fa5]+$/];
                 return (val.length >= 6 && val.length <= 18) && password_reg[0].test(val) && password_reg[1].test(val);
-            }
-            ,
+            },
             /**
              * 手机号码是否存在
              * @param {any} call

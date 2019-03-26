@@ -76,6 +76,12 @@
     <Content Include="css\index.min.css">
       <DependentUpon>index.css</DependentUpon>
     </Content>
+    <Content Include="css\orderdetails.css">
+      <DependentUpon>orderdetails.less</DependentUpon>
+    </Content>
+    <Content Include="css\orderdetails.min.css">
+      <DependentUpon>orderdetails.css</DependentUpon>
+    </Content>
     <Content Include="css\register.css">
       <DependentUpon>register.less</DependentUpon>
     </Content>
@@ -94,6 +100,9 @@
     <Content Include="css\dist\fonts\zi-tm.svg" />
     <Content Include="css\zico_gov.min.css" />
     <Content Include="css\zico_tm.min.css" />
+    <Content Include="images\marker-end.png" />
+    <Content Include="images\marker-start.png" />
+    <Content Include="images\marker-way.png" />
     <Content Include="images\user-headprotrait\def_headportrait.png" />
     <Content Include="images\pic4.jpg" />
     <Content Include="images\bg.jpg" />
@@ -101,6 +110,7 @@
     <Content Include="images\pic2.jpg" />
     <Content Include="images\pic3.jpg" />
     <Content Include="index.html" />
+    <Content Include="orderdetails.html" />
     <Content Include="register.html" />
     <Content Include="Script\bootstrap.min.js" />
     <Content Include="Script\dialog.js" />
@@ -110,6 +120,7 @@
     <Content Include="Script\jquery-3.2.1.min.js" />
     <Content Include="Script\jquery.cookie-1.4.1.min.js" />
     <Content Include="Script\login.js" />
+    <Content Include="Script\orderdetails.js" />
     <Content Include="Script\popper.min.js" />
     <Content Include="Script\register.js" />
     <Content Include="Script\tooltip.min.js" />
@@ -138,6 +149,7 @@
     <Content Include="css\dist\fonts\zi-tm.ttf" />
     <Content Include="css\dist\fonts\zi-tm.woff" />
     <Content Include="css\user.less" />
+    <Content Include="css\orderdetails.less" />
     <None Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

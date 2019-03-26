@@ -161,9 +161,9 @@ namespace API.API
                 }
                 JObject us_json = UserDAL.GetInfo(us_id);
                 JObject car_json = CarDAL.GetInfo(us_id);
-                JArray or_processing = OrderDAL.GetProcessing(us_id);
-                JArray or_all = OrderDAL.GetAll(us_id);
-                JArray or_completed = OrderDAL.GetCompleted(us_id);
+                int or_processing_cnt = OrderDAL.GetProcessingCount(us_id);
+                int or_all_cnt = OrderDAL.GetAllCount(us_id);
+                int or_completed_cnt = OrderDAL.GetCompletedCount(us_id);
                 JArray nt_Unprocessed = NoticeDAL.GetUnprocessed(us_id);
 
                 JObject d_us = new JObject();
@@ -177,9 +177,9 @@ namespace API.API
                 d_car.Add("car_idcard", car_json == null ? null : car_json["car_idcard"]);
 
                 JObject d_or = new JObject();
-                d_or.Add("processing_count", or_processing.Count);
-                d_or.Add("all_count", or_all.Count);
-                d_or.Add("completed_count", or_completed.Count);
+                d_or.Add("processing_count", or_processing_cnt);
+                d_or.Add("all_count", or_all_cnt);
+                d_or.Add("completed_count", or_completed_cnt);
 
                 JObject d_nt = new JObject();
                 d_nt.Add("unprocessed_count", nt_Unprocessed.Count);
@@ -197,6 +197,39 @@ namespace API.API
                 return SendData(400, "请求错误");
             }
         }
-
+        /// <summary>
+        /// 修改密码
+        /// </summary>
+        /// <param name="in_data"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JObject UpdatePassword(dynamic in_data)
+        {
+            try
+            {
+                JObject data = JObject.Parse(in_data.ToString());
+                string us_id = data["CarpoolSSID"]?.ToString();
+                string tel = data["tel"]?.ToString();
+                string telcode = data["telcode"]?.ToString();
+                string password = data["password"]?.ToString();
+                if (us_id == null || Session["CarpoolSSID"]?.ToString() != us_id)
+                {
+                    return SendData(15001, "未授权访问");
+                }
+                JObject telcode_json = (JObject)Session["telcode"];
+                if (telcode_json["tel"].ToString() != tel ||
+                    telcode_json["telcode"].ToString() != telcode)
+                    return SendData(12002, "短信验证码错误");
+                Session.Remove("telcode");
+                bool result = UserDAL.UpdatePassword(us_id, password);
+                if (!result)
+                    return SendData(-1, "修改失败");
+                return SendData(200, "密码修改成功,请使用新密码登录");
+            }
+            catch (Exception e)
+            {
+                return SendData(400, "请求错误");
+            }
+        }
     }
 }

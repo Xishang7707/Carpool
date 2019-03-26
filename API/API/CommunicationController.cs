@@ -17,6 +17,7 @@ namespace API.API
         /// <returns></returns>
         /// option
         ///     0.注册
+        ///     1.修改密码
         [HttpPost]
         public JObject SendTelCode(dynamic in_data)
         {
@@ -27,9 +28,6 @@ namespace API.API
                 string option = data["option"]?.ToString();
                 if (tel == null || tel.Length != 11 || option == "")
                     return SendData(12001, "短信发送失败");
-                Random rand = new Random((int)GetNowTime());
-                string telcode = rand.Next(100000, 999999) + "";
-                bool result = SendTelCode(tel, telcode);
 
                 switch (option)
                 {
@@ -37,9 +35,24 @@ namespace API.API
                         if (UserDAL.Exist(tel))
                             return SendData(10001, "手机号码已被注册");
                         break;
+                    case "1":
+                        string ssid = data["CarpoolSSID"]?.ToString();
+
+                        if (ssid == null || Session["CarpoolSSID"]?.ToString() != ssid)
+                            return SendData(15001, "未授权访问");
+
+                        JObject us_json = UserDAL.GetInfo(ssid);
+                        if (us_json == null || us_json["tel"].ToString() != tel)
+                        {
+                            return SendData(10002, "手机号码错误");
+                        }
+                        break;
                     default:
                         return SendData(400, "请求错误");
                 }
+                Random rand = new Random((int)GetNowTime());
+                string telcode = rand.Next(100000, 999999) + "";
+                bool result = SendTelCode(tel, telcode);
 
                 if (!result)
                     return SendData(12001, "短信发送失败");

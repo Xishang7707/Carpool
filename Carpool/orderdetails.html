@@ -1,0 +1,222 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">-->
+    <title>Carpool - 拼车详情</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/build.css" rel="stylesheet" />
+    <link href="css/zico.min.css" rel="stylesheet" />
+
+    <link href="css/orderdetails.min.css" rel="stylesheet" />
+
+    <script src="Script/jquery-3.2.1.min.js"></script>
+    <script src="Script/popper.min.js"></script>
+    <script src="Script/bootstrap.min.js"></script>
+    <script src="Script/jquery.cookie-1.4.1.min.js"></script>
+    <script src="Script/vue.js"></script>
+    <!--<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=24661721a13ef054b221f80ab69b36e8"></script>-->
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=creGl1m1QdF4GxrBoNLNYvlbEIZCIcLi"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay_min.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js"></script>
+
+    <script src="Script/global.js"></script>
+    <script src="Script/login.js"></script>
+    <script src="Script/orderdetails.js"></script>
+    <script src="Script/dialog.js"></script>
+</head>
+<body>
+    <!--<div class="container-fluid" >
+        <div class="float-right container-fluid">
+            <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+                <a class="navbar-brand" href="#">Carpool - 拼车详情</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end" id="collapsibleNavbar">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link text-light" href="index.html">首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-light" href="index.html#page-2">打车</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-light" href="index.html#page-3">拉客</a>
+                        </li>
+                        <li class="nav-item nav-login">
+                            <a class="nav-link text-light" data-target="#Login_dialog">登陆</a>
+                        </li>
+                        <li class="nav-item nav-login">
+                            <a class="nav-link text-light" href="register.html">注册</a>
+                        </li>
+                        <li class="nav-item dropdown mr-5 d-none user-menu">
+
+                            <a class="nav-link dropdown-toggle text-light user-info-name" data-display="static" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"></a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a class="dropdown-item" href="user.html">个人中心</a>
+                                <a class="dropdown-item" href="#">消息</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" data-target="#Login_dialog">切换用户</a>
+                                <a class="dropdown-item" data-target='Login_logout'>登出</a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-light" href="#">关于</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </div>-->
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top">
+            <a class="navbar-brand" href="#">Carpool - 拼车详情</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="collapsibleNavbar">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="index.html">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="index.html#page-2">打车</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="index.html#page-3">拉客</a>
+                    </li>
+                    <li class="nav-item nav-login">
+                        <a class="nav-link text-light" data-target="#Login_dialog">登陆</a>
+                    </li>
+                    <li class="nav-item nav-login">
+                        <a class="nav-link text-light" href="register.html">注册</a>
+                    </li>
+                    <li class="nav-item dropdown mr-5 d-none user-menu">
+
+                        <a class="nav-link dropdown-toggle text-light user-info-name" data-display="static" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"></a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="user.html">个人中心</a>
+                            <a class="dropdown-item" href="#">消息</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" data-target="#Login_dialog">切换用户</a>
+                            <a class="dropdown-item" data-target='Login_logout'>登出</a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="#">关于</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+    <div class="container-fluid page-1" style="margin-top:56px;" id="details-content">
+        <div class="row m-0">
+            <div class="col-6 p-0 page-1 flex-fill">
+                <div id="map-content" style="height:100%">
+
+                </div>
+            </div>
+            <div class="col-6 p-0 d-flex page-1">
+                <div class="container flex-fill">
+                    <div class="row mt-5">
+                        <div class="col">
+                            <h3>{{order['startplace']}}<i class="zi zi_longarrowaltright pl-3 pr-3"></i>{{order['endplace']}}</h3>
+                        </div>
+                        <div class="col-3 text-right">
+                            <a href="#" class="text-danger">举报</a>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col">
+                            <span class="font-weight-bold">途径：</span>
+                            <span>{{order['way']==null||order['way']==''?'无':order['way']}}</span>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col">
+                            <span class="font-weight-bold">出发时间：</span>
+                            <span>{{format_date(order['starttime'], 'yyyy-MM-dd hh:mm')}}</span>
+                        </div>
+                        <div class="col text-right">
+                            <span class="font-weight-bold">发布时间：</span>
+                            <span>{{format_date(order['time'], 'yyyy-MM-dd hh:mm')}}</span>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row mt-3">
+                        <div class="col-4">
+                            <span class="font-weight-bold">预计路程：</span>
+                            <span>{{distance}}公里</span>
+                        </div>
+                        <!--<div class="col-4">
+                            <span class="font-weight-bold">预计费用：</span>
+                            <span></span>
+                        </div>-->
+                    </div>
+                    <div class="row mt-3" v-if="order['identity']==1">
+                        <div class="col-4">
+                            <span class="font-weight-bold">可容纳人数：</span>
+                            <span>{{car['capacity']}}人</span>
+                        </div>
+                        <div class="col-4">
+                            <span class="font-weight-bold">加入人数：</span>
+                            <span>{{applycount['applyedcount']}}人</span>
+                        </div>
+                        <div class="col-4 text-right">
+                            <span>已有<span class="text-danger font-weight-bold">{{applycount['applyingcount']}}</span>人申请加入此拼车</span>
+                        </div>
+                    </div>
+                    <!--<div v-else class="row mt-3" v-if="order['identity']==1">
+                        <div class="col-4">
+                            <span class="font-weight-bold">加入人数：</span>
+                            <span>{{applycount['applyingcount']}}人</span>
+                        </div>
+                        <div class="col text-right">
+                            <span>已有<span class="text-danger font-weight-bold">{{applycount['applyedcount']}}</span>人申请加入此拼车</span>
+                        </div>
+                    </div>-->
+                    <div class="row mt-3">
+                        <div class="col-4" v-if="order['identity']==1">
+                            <span class="font-weight-bold">汽车类型：</span>
+                            <span>{{cartype[car['car_type']]}}</span>
+                        </div>
+                        <div class="col-4">
+                            <span class="font-weight-bold">费用方式：</span>
+                            <span>{{paytype[orderdetails['paytype']]}}</span>
+                            <span v-if="orderdetails['paytype']==2">¥{{orderdetails['price']}}</span>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-4">
+                            <span class="font-weight-bold">车主留言：</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col border m-3 p-3" style="border-style:dashed;">
+                            <span class="p-3">{{order['remarks']}}</span>
+                        </div>
+                    </div>
+                    <div class="row" v-if="us_id!=order['us_id']">
+                        <div class="col d-flex justify-content-center" v-if="order['identity']==1">
+                            <button class="btn btn-primary mr-3" @click="applyorder(order['or_id'])" v-if="isapplyorinvate!=1">申请加入</button>
+                            <button class="btn btn-primary mr-3" v-else disabled>已申请</button>
+                            <button class="btn btn-primary ml-3 mr-3" @click="getchatowner">联系车主</button>
+                        </div>
+                        <div class="col d-flex justify-content-center" v-else>
+                            <button class="btn btn-primary mr-3" @click="invateorder(order['or_id'])" v-if="isapplyorinvate!=1">邀请加入</button>
+                            <button class="btn btn-primary mr-3" v-else disabled>已邀请</button>
+                            <button class="btn btn-primary ml-3 mr-3" @click="getchatowner">联系乘客</button>
+                        </div>
+                    </div>
+                    <div class="row" v-else>
+                        <div class="col d-flex justify-content-center">
+                            <span class="font-weight-bold">此拼车由自己发布</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -131,6 +131,7 @@
   <ItemGroup>
     <Compile Include="API\APIController.cs" />
     <Compile Include="API\CarpoolController.cs" />
+    <Compile Include="API\CarsController.cs" />
     <Compile Include="API\CommunicationController.cs" />
     <Compile Include="API\UsersController.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />

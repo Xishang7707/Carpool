@@ -11,6 +11,7 @@
     <link href="css/user.min.css" rel="stylesheet" />
 
     <script src="Script/jquery-3.2.1.min.js"></script>
+    <script src="Script/popper.min.js"></script>
     <script src="Script/bootstrap.min.js"></script>
     <script src="Script/jquery.cookie-1.4.1.min.js"></script>
     <script src="Script/vue.js"></script>
@@ -71,14 +72,15 @@
                 <a class="list-group-item title text-white"><i class="zi zi_useralt mr-2"></i>用户管理</a>
                 <a class="list-group-item list-group-item-dark list-group-item-action pl-5 text-light active" href="#menu-user-info" data-toggle="list">基本信息</a>
                 <a class="list-group-item list-group-item-dark list-group-item-action pl-5 text-light" href="#menu-user-updatepassword" data-toggle="list">修改密码</a>
+                <a class="list-group-item list-group-item-dark list-group-item-action pl-5 text-light" href="#menu-user-car" data-toggle="list">成为司机</a>
                 <a class="list-group-item title text-white"><i class="zi zi_list mr-2"></i>订单管理</a>
                 <a class="list-group-item list-group-item-dark list-group-item-action pl-5 text-light" href="#menu-order-all" data-toggle="list">全部订单</a>
                 <a class="list-group-item list-group-item-dark list-group-item-action pl-5 text-light" href="#menu-order-processing" data-toggle="list">进行中</a>
                 <a class="list-group-item list-group-item-dark list-group-item-action pl-5 text-light" href="#menu-order-completed" data-toggle="list">已完成</a>
             </div>
             <div class="flex-grow-1 tab-content" style="min-height:-webkit-fill-available;">
+                <!-- 基本信息 -->
                 <div id="menu-user-info" class="tab-pane fade show active">
-                    <!-- 基本信息 -->
                     <div class="container">
                         <div class="row">
                             <div class="col pt-md-2 text-center">
@@ -155,29 +157,585 @@
                         </div>
                     </div>
                 </div>
+                <!-- 修改密码 -->
                 <div id="menu-user-updatepassword" class="tab-pane fade">
-                    <!-- 修改密码 -->
-                    <div class="container">
-                        <div class="card">
-                            <div class="card-body">
+                    <div class="container d-flex flex-wrap justify-content-center align-content-center" style="min-height:-webkit-fill-available">
+                        <div class="card col-5">
+                            <div class="container card-body">
                                 <h5 class="card-title">修改密码</h5>
-                                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                                <a href="#" class="btn btn-primary">Go somewhere</a>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">手机号码</span>
+                                            </div>
+                                            <input type="tel" class="form-control tel" v-model="tel" maxlength="11" placeholder="登录的手机号码">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">验证码</span>
+                                            </div>
+                                            <input type="text" class="form-control telcode" v-model="telcode" maxlength="6" placeholder="6位数字">
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-primary" v-on:click="telcode_send">发送短信验证码</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">新密码</span>
+                                            </div>
+                                            <input type="password" class="form-control password" v-model="password" maxlength="18" placeholder="6-18个字符">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <button class="btn btn-primary btn-lg btn-block" v-on:click="updatepassword">修改密码</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                <div id="menu-user-car" class="tab-pane fade">
+                    <!-- 成为司机 -->
+                    <div class="container d-flex flex-wrap justify-content-center align-content-center" style="min-height:-webkit-fill-available">
+                        <div class="card col-5">
+                            <div class="container card-body">
+                                <h5 class="card-title">申请成为司机</h5>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">车名</span>
+                                            </div>
+                                            <input type="text" class="form-control carname" v-model="carname" maxlength="10" placeholder="车辆名称">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">车牌号</span>
+                                            </div>
+                                            <input type="text" class="form-control carname" v-model="caridcard" maxlength="8" placeholder="车牌号码">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col mb-3">
+                                        <select v-model="cartype" class="custom-select custom-control-inline cartype">
+                                            <option value="-1">---车辆类型---</option>
+                                            <option value="0">轿车</option>
+                                            <option value="1">MPV</option>
+                                            <option value="2">SUV</option>
+                                            <option value="3">跑车</option>
+                                            <option value="4">客车</option>
+                                            <option value="5">其他</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">容量</span>
+                                            </div>
+                                            <input type="text" class="form-control capacity" v-model="capacity" maxlength="2" placeholder="承载人数">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <button class="btn btn-primary btn-lg btn-block" v-on:click="applycar">申请成为司机</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 全部订单 -->
                 <div id="menu-order-all" class="tab-pane fade">
-                    <!-- 全部订单 -->
-                    <h1>全部订单</h1>
+                    <div class="container-fluid p-3">
+                        <div class="container-fluid p-2 table-order-all">
+                            <div class="row border p-2" style="background:#f5f5f5;">
+                                <div class="col"><span class="small">路线</span></div>
+                                <div class="col-2"><span class="small">费用</span></div>
+                                <div class="col-2 text-center"><span class="small">订单操作</span></div>
+                                <div class="col-1 text-center"><span class="small">状态</span></div>
+                                <div class="col-2 text-center"><span class="small">交易操作</span></div>
+                            </div>
+                            <div class="row border mt-3" v-for="item in orderlist">
+                                <div class="col">
+                                    <div class="row p-2" style="background:#f5f5f5;">
+                                        <div class="col">
+                                            <span class="small font-weight-bold">编号：</span><span class="small">{{item['order']['or_id']}}</span>
+                                            <span class="small font-weight-bold ml-3">出发时间：</span><span class="small">{{dataformat(item['order']['starttime'], 'yyyy-MM-dd hh:mm')}}</span>
+                                            <span class="small font-weight-bold ml-3">创建时间：</span><span class="small">{{dataformat(item['order']['time'], 'yyyy-MM-dd hh:mm')}}</span>
+                                        </div>
+                                        <div class="col-2">
+                                            <span class="small font-weight-bold">联系方式：</span>
+                                            <small class="small" v-if="item['carus']!=null">{{item['user']['name']}} {{item['user']['tel']}}</small>
+                                            <small class="small" v-else>无司机</small>
+                                        </div>
+                                        <div class="col-2"></div>
+                                        <div class="col-1"></div>
+                                        <div class="col-2"></div>
+                                    </div>
+                                    <!--data-toggle="collapse" v-on:click="person_list_toggle(item['order']['or_id'], $event)"-->
+                                    <div class="row p-2">
+                                        <div class="col">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <span class="font-weight-bold" v-bind:class="{'text-primary':item['owner']['identity']==1}" style="cursor:pointer;" data-toggle="collapse" v-on:click="person_list_toggle(item['order']['or_id'], $event)">{{item['order']['startplace']}}<i class="zi zi_longarrowaltright pl-3 pr-3"></i>{{item['order']['endplace']}}</span>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <span class="small font-weight-bold">途径：</span>
+                                                    <span class="small">{{item['order']['way']}}</span>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <span class="small font-weight-bold">备注：</span>
+                                                    <span class="small" style="color:#777">{{item['order']['remarks']}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-2 d-flex flex-wrap align-content-center">
+                                            <span class="font-weight-bold" v-if="item['order']['paytype']==0">免费</span>
+                                            <span class="font-weight-bold" v-else-if="item['order']['paytype']==1">面谈</span>
+                                            <span class="font-weight-bold" v-else>¥{{item['orderdetail']['price']}}</span>
+                                        </div>
+                                        <div class="col-2 d-flex flex-wrap justify-content-center align-content-center">
+                                            <div class="dropdown">
+                                                <button type="button" class="btn btn-primary dropdown-toggle" v-if="item['carus']!=null&&item['carus']['id']==us_id" data-toggle="dropdown">操作</button>
+                                                <div class="dropdown-menu">
+                                                    <!--<button v-if="item['order']['us_id']==us_id&&item['orderdetail']['identity']==1" class="dropdown-item btn">完成订单</button>
+                                                    <button class="dropdown-item btn">关闭订单</button>-->
+                                                    <button v-if="item['order']['us_id']==us_id&&item['orderdetail']['identity']==1" class="dropdown-item btn" @click="completeOrder(item['order']['or_id'])">完成订单</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-1 d-flex flex-wrap justify-content-center align-content-center">
+                                            <!--<span>状态</span>-->
+                                            <span class="small font-weight-bold" v-if="item['order']['or_state']==0||item['order']['or_state']==1">进行中</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==10">申请中</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==11">被拒绝</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==15">邀请中</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==20">完成</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==30">被关闭</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==31">关闭</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==40">失效</span>
+                                        </div>
+                                        <div class="col-2 d-flex flex-wrap justify-content-center align-content-center">
+                                            <!--<span>交易操作</span>-->
+                                            <div class="dropdown" v-if="item['owner']['identity']!=1">
+                                                <button type="button" class="btn btn-primary dropdown-toggle font-weight-bold" data-toggle="dropdown">付款</button>
+                                                <div class="dropdown-menu dropdown-menu-right">
+                                                    <button class="dropdown-item btn">现金</button>
+                                                    <button class="dropdown-item btn">支付宝</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row collapse border-top person-list" data-parent="#menu-order-all" :id="'person-list-'+item['order']['or_id']">
+                                        <div class="col">
+                                            <!-- v-if="item['owner']['identity']==1" -->
+                                            <div class="row p-2" v-for="pers in item['info']">
+                                                <div class="col">
+                                                    <div class="row">
+                                                        <div class="col-1  d-flex flex-wrap align-content-center">
+                                                            <span class="font-weight-bold" v-if="pers['orderdetail']['identity']==1">司机</span>
+                                                        </div>
+                                                        <div class="col  d-flex flex-wrap align-content-center">
+                                                            <span class="font-weight-bold">{{pers['user']['name']}} {{pers['user']['tel']}}</span>
+                                                        </div>
+                                                        <div class="col-2 d-flex flex-wrap align-content-center" v-if="pers['orderdetail']['identity']!=1">
+                                                            <span class="font-weight-bold" v-if="item['order']['paytype']==0">免费</span>
+                                                            <span class="font-weight-bold" v-else-if="item['order']['paytype']==1">面谈</span>
+                                                            <span class="font-weight-bold" v-else>¥{{item['orderdetail']['price']}} <span class="small">{{item['orderdetail']['ispay']==0?'未付款':'已付款'}}</span></span>
+                                                        </div>
+                                                        <div class="col-2 d-flex flex-wrap justify-content-center align-content-center">
+                                                            <div class="dropdown" v-if="pers['orderdetail']['identity']!=1">
+                                                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">操作</button>
+                                                                <div class="dropdown-menu">
+                                                                    <button class="dropdown-item btn" @click="agree(pers['orderdetail']['or_id'], pers['orderdetail']['ods_id'])">同意申请</button>
+                                                                    <button class="dropdown-item btn">拒绝申请</button>
+                                                                    <!--<button class="dropdown-item btn" v-if="pers['orderdetail']['or_state']==0">踢出</button>-->
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-1 text-center">
+                                                            <span class="small font-weight-bold" v-if="pers['orderdetail']['or_state']==0||item['order']['or_state']==1">进行中</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==10">申请中</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==11">被拒绝</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==15">邀请中</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==20">完成</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==30">被关闭</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==31">关闭</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==40">失效</span>
+                                                        </div>
+                                                        <div class="col-2  d-flex flex-wrap justify-content-center align-content-center">
+                                                            <div class="dropdown" v-if="pers['orderdetail']['identity']!=1">
+                                                                <button type="button" class="btn btn-primary dropdown-toggle font-weight-bold" data-toggle="dropdown">付款</button>
+                                                                <div class="dropdown-menu dropdown-menu-right">
+                                                                    <button class="dropdown-item btn">现金</button>
+                                                                    <button class="dropdown-item btn">支付宝</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row p-2" v-if="item['owner']['identity']!=1">
+                                                <div class="col d-flex justify-content-center">
+                                                    <span class="small font-weight-bold">您不是司机，不能查看该订单的乘客</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 页码 -->
+                        <!--<div class="container p-2" v-if="searchcondition['pages']!=0">
+                            <nav aria-label="navigation">
+                                <ul class="pagination d-flex flex-wrap justify-content-center">
+                                    <li class="page-item" v-bind:class="{'disabled':searchcondition['curpage']==1}"><button class="page-link" v-on:click="page_prev">上一页</button></li>
+                                    <li class="page-item" v-for="index in (searchcondition['pages'])" v-bind:class="{'active':index==searchcondition['curpage']}"><button v-on:click="page_number_search(index)" class="page-link">{{index}}</button></li>
+                                    <li class="page-item" v-bind:class="{'disabled':searchcondition['curpage']==searchcondition['pages']}"><button class="page-link" v-on:click="page_next">下一页</button></li>
+                                </ul>
+                            </nav>
+                        </div>-->
+                    </div>
                 </div>
                 <div id="menu-order-processing" class="tab-pane fade">
-                    <!-- 全部订单 -->
-                    <h1>全部订单</h1>
+                    <!-- 进行中订单 -->
+                    <div class="container-fluid p-3">
+                        <div class="container-fluid p-2 table-order-all">
+                            <div class="row border p-2" style="background:#f5f5f5;">
+                                <div class="col"><span class="small">路线</span></div>
+                                <div class="col-2"><span class="small">费用</span></div>
+                                <div class="col-2 text-center"><span class="small">订单操作</span></div>
+                                <div class="col-1 text-center"><span class="small">状态</span></div>
+                                <div class="col-2 text-center"><span class="small">交易操作</span></div>
+                            </div>
+                            <div class="row border mt-3" v-for="item in orderlist">
+                                <div class="col">
+                                    <div class="row p-2" style="background:#f5f5f5;">
+                                        <div class="col">
+                                            <span class="small font-weight-bold">编号：</span><span class="small">{{item['order']['or_id']}}</span>
+                                            <span class="small font-weight-bold ml-3">出发时间：</span><span class="small">{{dataformat(item['order']['starttime'], 'yyyy-MM-dd hh:mm')}}</span>
+                                            <span class="small font-weight-bold ml-3">创建时间：</span><span class="small">{{dataformat(item['order']['time'], 'yyyy-MM-dd hh:mm')}}</span>
+                                        </div>
+                                        <div class="col-2">
+                                            <span class="small font-weight-bold">联系方式：</span>
+                                            <small class="small" v-if="item['carus']!=null">{{item['user']['name']}} {{item['user']['tel']}}</small>
+                                            <small class="small" v-else>无司机</small>
+                                        </div>
+                                        <div class="col-2"></div>
+                                        <div class="col-1"></div>
+                                        <div class="col-2"></div>
+                                    </div>
+                                    <!--data-toggle="collapse" v-on:click="person_list_toggle(item['order']['or_id'], $event)"-->
+                                    <div class="row p-2">
+                                        <div class="col">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <span class="font-weight-bold" v-bind:class="{'text-primary':item['owner']['identity']==1}" style="cursor:pointer;" data-toggle="collapse" v-on:click="person_list_toggle(item['order']['or_id'], $event)">{{item['order']['startplace']}}<i class="zi zi_longarrowaltright pl-3 pr-3"></i>{{item['order']['endplace']}}</span>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <span class="small font-weight-bold">途径：</span>
+                                                    <span class="small">{{item['order']['way']}}</span>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <span class="small font-weight-bold">备注：</span>
+                                                    <span class="small" style="color:#777">{{item['order']['remarks']}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-2 d-flex flex-wrap align-content-center">
+                                            <span class="font-weight-bold" v-if="item['order']['paytype']==0">免费</span>
+                                            <span class="font-weight-bold" v-else-if="item['order']['paytype']==1">面谈</span>
+                                            <span class="font-weight-bold" v-else>¥{{item['orderdetail']['price']}}</span>
+                                        </div>
+                                        <div class="col-2 d-flex flex-wrap justify-content-center align-content-center">
+                                            <div class="dropdown">
+                                                <button type="button" class="btn btn-primary dropdown-toggle" v-if="item['carus']!=null&&item['carus']['id']==us_id" data-toggle="dropdown">操作</button>
+                                                <div class="dropdown-menu">
+                                                    <!--<button v-if="item['order']['us_id']==us_id&&item['orderdetail']['identity']==1" class="dropdown-item btn">完成订单</button>
+                                                    <button class="dropdown-item btn">关闭订单</button>-->
+                                                    <button v-if="item['order']['us_id']==us_id&&item['orderdetail']['identity']==1" class="dropdown-item btn" @click="completeOrder(item['order']['or_id'])">完成订单</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-1 d-flex flex-wrap justify-content-center align-content-center">
+                                            <!--<span>状态</span>-->
+                                            <span class="small font-weight-bold" v-if="item['order']['or_state']==0||item['order']['or_state']==1">进行中</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==10">申请中</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==11">被拒绝</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==15">邀请中</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==20">完成</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==30">被关闭</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==31">关闭</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==40">失效</span>
+                                        </div>
+                                        <div class="col-2 d-flex flex-wrap justify-content-center align-content-center">
+                                            <!--<span>交易操作</span>-->
+                                            <div class="dropdown" v-if="item['owner']['identity']!=1">
+                                                <button type="button" class="btn btn-primary dropdown-toggle font-weight-bold" data-toggle="dropdown">付款</button>
+                                                <div class="dropdown-menu dropdown-menu-right">
+                                                    <button class="dropdown-item btn">现金</button>
+                                                    <button class="dropdown-item btn">支付宝</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row collapse border-top person-list" data-parent="#menu-order-all" :id="'person-list-processing-'+item['order']['or_id']">
+                                        <div class="col">
+                                            <!-- v-if="item['owner']['identity']==1" -->
+                                            <div class="row p-2" v-for="pers in item['info']">
+                                                <div class="col">
+                                                    <div class="row">
+                                                        <div class="col-1  d-flex flex-wrap align-content-center">
+                                                            <span class="font-weight-bold" v-if="pers['orderdetail']['identity']==1">司机</span>
+                                                        </div>
+                                                        <div class="col  d-flex flex-wrap align-content-center">
+                                                            <span class="font-weight-bold">{{pers['user']['name']}} {{pers['user']['tel']}}</span>
+                                                        </div>
+                                                        <div class="col-2 d-flex flex-wrap align-content-center" v-if="pers['orderdetail']['identity']!=1">
+                                                            <span class="font-weight-bold" v-if="item['order']['paytype']==0">免费</span>
+                                                            <span class="font-weight-bold" v-else-if="item['order']['paytype']==1">面谈</span>
+                                                            <span class="font-weight-bold" v-else>¥{{item['orderdetail']['price']}} <span class="small">{{item['orderdetail']['ispay']==0?'未付款':'已付款'}}</span></span>
+                                                        </div>
+                                                        <div class="col-2 d-flex flex-wrap justify-content-center align-content-center">
+                                                            <div class="dropdown" v-if="pers['orderdetail']['identity']!=1">
+                                                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">操作</button>
+                                                                <div class="dropdown-menu">
+                                                                    <button class="dropdown-item btn" @click="agree(pers['orderdetail']['or_id'], pers['orderdetail']['ods_id'])">同意申请</button>
+                                                                    <button class="dropdown-item btn">拒绝申请</button>
+                                                                    <!--<button class="dropdown-item btn" v-if="pers['orderdetail']['or_state']==0">踢出</button>-->
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-1 text-center">
+                                                            <span class="small font-weight-bold" v-if="pers['orderdetail']['or_state']==0||item['order']['or_state']==1">进行中</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==10">申请中</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==11">被拒绝</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==15">邀请中</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==20">完成</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==30">被关闭</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==31">关闭</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==40">失效</span>
+                                                        </div>
+                                                        <div class="col-2  d-flex flex-wrap justify-content-center align-content-center">
+                                                            <div class="dropdown" v-if="pers['orderdetail']['identity']!=1">
+                                                                <button type="button" class="btn btn-primary dropdown-toggle font-weight-bold" data-toggle="dropdown">付款</button>
+                                                                <div class="dropdown-menu dropdown-menu-right">
+                                                                    <button class="dropdown-item btn">现金</button>
+                                                                    <button class="dropdown-item btn">支付宝</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row p-2" v-if="item['owner']['identity']!=1">
+                                                <div class="col d-flex justify-content-center">
+                                                    <span class="small font-weight-bold">您不是司机，不能查看该订单的乘客</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 页码 -->
+                        <!--<div class="container p-2" v-if="searchcondition['pages']!=0">
+                            <nav aria-label="navigation">
+                                <ul class="pagination d-flex flex-wrap justify-content-center">
+                                    <li class="page-item" v-bind:class="{'disabled':searchcondition['curpage']==1}"><button class="page-link" v-on:click="page_prev">上一页</button></li>
+                                    <li class="page-item" v-for="index in (searchcondition['pages'])" v-bind:class="{'active':index==searchcondition['curpage']}"><button v-on:click="page_number_search(index)" class="page-link">{{index}}</button></li>
+                                    <li class="page-item" v-bind:class="{'disabled':searchcondition['curpage']==searchcondition['pages']}"><button class="page-link" v-on:click="page_next">下一页</button></li>
+                                </ul>
+                            </nav>
+                        </div>-->
+                    </div>
                 </div>
                 <div id="menu-order-completed" class="tab-pane fade">
                     <!-- 已完成 -->
-                    <h1>已完成</h1>
+                    <div class="container-fluid p-3">
+                        <div class="container-fluid p-2 table-order-all">
+                            <div class="row border p-2" style="background:#f5f5f5;">
+                                <div class="col"><span class="small">路线</span></div>
+                                <div class="col-2"><span class="small">费用</span></div>
+                                <div class="col-2 text-center"><span class="small">订单操作</span></div>
+                                <div class="col-1 text-center"><span class="small">状态</span></div>
+                                <div class="col-2 text-center"><span class="small">交易操作</span></div>
+                            </div>
+                            <div class="row border mt-3" v-for="item in orderlist">
+                                <div class="col">
+                                    <div class="row p-2" style="background:#f5f5f5;">
+                                        <div class="col">
+                                            <span class="small font-weight-bold">编号：</span><span class="small">{{item['order']['or_id']}}</span>
+                                            <span class="small font-weight-bold ml-3">出发时间：</span><span class="small">{{dataformat(item['order']['starttime'], 'yyyy-MM-dd hh:mm')}}</span>
+                                            <span class="small font-weight-bold ml-3">创建时间：</span><span class="small">{{dataformat(item['order']['time'], 'yyyy-MM-dd hh:mm')}}</span>
+                                        </div>
+                                        <div class="col-2">
+                                            <span class="small font-weight-bold">联系方式：</span>
+                                            <small class="small" v-if="item['carus']!=null">{{item['user']['name']}} {{item['user']['tel']}}</small>
+                                            <small class="small" v-else>无司机</small>
+                                        </div>
+                                        <div class="col-2"></div>
+                                        <div class="col-1"></div>
+                                        <div class="col-2"></div>
+                                    </div>
+                                    <!--data-toggle="collapse" v-on:click="person_list_toggle(item['order']['or_id'], $event)"-->
+                                    <div class="row p-2">
+                                        <div class="col">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <span class="font-weight-bold" v-bind:class="{'text-primary':item['owner']['identity']==1}" style="cursor:pointer;" data-toggle="collapse" v-on:click="person_list_toggle(item['order']['or_id'], $event)">{{item['order']['startplace']}}<i class="zi zi_longarrowaltright pl-3 pr-3"></i>{{item['order']['endplace']}}</span>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <span class="small font-weight-bold">途径：</span>
+                                                    <span class="small">{{item['order']['way']}}</span>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <span class="small font-weight-bold">备注：</span>
+                                                    <span class="small" style="color:#777">{{item['order']['remarks']}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-2 d-flex flex-wrap align-content-center">
+                                            <span class="font-weight-bold" v-if="item['order']['paytype']==0">免费</span>
+                                            <span class="font-weight-bold" v-else-if="item['order']['paytype']==1">面谈</span>
+                                            <span class="font-weight-bold" v-else>¥{{item['orderdetail']['price']}}</span>
+                                        </div>
+                                        <div class="col-2 d-flex flex-wrap justify-content-center align-content-center">
+                                            <div class="dropdown">
+                                                <button type="button" class="btn btn-primary dropdown-toggle" v-if="item['carus']!=null&&item['carus']['id']==us_id" data-toggle="dropdown">操作</button>
+                                                <div class="dropdown-menu">
+                                                    <!--<button v-if="item['order']['us_id']==us_id&&item['orderdetail']['identity']==1" class="dropdown-item btn">完成订单</button>
+                                                    <button class="dropdown-item btn">关闭订单</button>-->
+                                                    <button v-if="item['order']['us_id']==us_id&&item['orderdetail']['identity']==1" class="dropdown-item btn" @click="completeOrder(item['order']['or_id'])">完成订单</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-1 d-flex flex-wrap justify-content-center align-content-center">
+                                            <!--<span>状态</span>-->
+                                            <span class="small font-weight-bold" v-if="item['order']['or_state']==0||item['order']['or_state']==1">进行中</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==10">申请中</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==11">被拒绝</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==15">邀请中</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==20">完成</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==30">被关闭</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==31">关闭</span>
+                                            <span class="small font-weight-bold" v-else-if="item['order']['or_state']==40">失效</span>
+                                        </div>
+                                        <div class="col-2 d-flex flex-wrap justify-content-center align-content-center">
+                                            <!--<span>交易操作</span>-->
+                                            <div class="dropdown" v-if="item['owner']['identity']!=1">
+                                                <button type="button" class="btn btn-primary dropdown-toggle font-weight-bold" data-toggle="dropdown">付款</button>
+                                                <div class="dropdown-menu dropdown-menu-right">
+                                                    <button class="dropdown-item btn">现金</button>
+                                                    <button class="dropdown-item btn">支付宝</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row collapse border-top person-list" data-parent="#menu-order-all" :id="'person-list-completed-'+item['order']['or_id']">
+                                        <div class="col">
+                                            <!-- v-if="item['owner']['identity']==1" -->
+                                            <div class="row p-2" v-for="pers in item['info']">
+                                                <div class="col">
+                                                    <div class="row">
+                                                        <div class="col-1  d-flex flex-wrap align-content-center">
+                                                            <span class="font-weight-bold" v-if="pers['orderdetail']['identity']==1">司机</span>
+                                                        </div>
+                                                        <div class="col  d-flex flex-wrap align-content-center">
+                                                            <span class="font-weight-bold">{{pers['user']['name']}} {{pers['user']['tel']}}</span>
+                                                        </div>
+                                                        <div class="col-2 d-flex flex-wrap align-content-center" v-if="pers['orderdetail']['identity']!=1">
+                                                            <span class="font-weight-bold" v-if="item['order']['paytype']==0">免费</span>
+                                                            <span class="font-weight-bold" v-else-if="item['order']['paytype']==1">面谈</span>
+                                                            <span class="font-weight-bold" v-else>¥{{item['orderdetail']['price']}} <span class="small">{{item['orderdetail']['ispay']==0?'未付款':'已付款'}}</span></span>
+                                                        </div>
+                                                        <div class="col-2 d-flex flex-wrap justify-content-center align-content-center">
+                                                            <div class="dropdown" v-if="pers['orderdetail']['identity']!=1">
+                                                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">操作</button>
+                                                                <div class="dropdown-menu">
+                                                                    <button class="dropdown-item btn" @click="agree(pers['orderdetail']['or_id'], pers['orderdetail']['ods_id'])">同意申请</button>
+                                                                    <button class="dropdown-item btn">拒绝申请</button>
+                                                                    <!--<button class="dropdown-item btn" v-if="pers['orderdetail']['or_state']==0">踢出</button>-->
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-1 text-center">
+                                                            <span class="small font-weight-bold" v-if="pers['orderdetail']['or_state']==0||item['order']['or_state']==1">进行中</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==10">申请中</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==11">被拒绝</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==15">邀请中</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==20">完成</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==30">被关闭</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==31">关闭</span>
+                                                            <span class="small font-weight-bold" v-else-if="pers['orderdetail']['or_state']==40">失效</span>
+                                                        </div>
+                                                        <div class="col-2  d-flex flex-wrap justify-content-center align-content-center">
+                                                            <div class="dropdown" v-if="pers['orderdetail']['identity']!=1">
+                                                                <button type="button" class="btn btn-primary dropdown-toggle font-weight-bold" data-toggle="dropdown">付款</button>
+                                                                <div class="dropdown-menu dropdown-menu-right">
+                                                                    <button class="dropdown-item btn">现金</button>
+                                                                    <button class="dropdown-item btn">支付宝</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row p-2" v-if="item['owner']['identity']!=1">
+                                                <div class="col d-flex justify-content-center">
+                                                    <span class="small font-weight-bold">您不是司机，不能查看该订单的乘客</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 页码 -->
+                        <!--<div class="container p-2" v-if="searchcondition['pages']!=0">
+                            <nav aria-label="navigation">
+                                <ul class="pagination d-flex flex-wrap justify-content-center">
+                                    <li class="page-item" v-bind:class="{'disabled':searchcondition['curpage']==1}"><button class="page-link" v-on:click="page_prev">上一页</button></li>
+                                    <li class="page-item" v-for="index in (searchcondition['pages'])" v-bind:class="{'active':index==searchcondition['curpage']}"><button v-on:click="page_number_search(index)" class="page-link">{{index}}</button></li>
+                                    <li class="page-item" v-bind:class="{'disabled':searchcondition['curpage']==searchcondition['pages']}"><button class="page-link" v-on:click="page_next">下一页</button></li>
+                                </ul>
+                            </nav>
+                        </div>-->
+                    </div>
                 </div>
 
             </div>

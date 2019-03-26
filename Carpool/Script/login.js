@@ -74,6 +74,10 @@ function Login_Show(login_call) {
                 var _this = $(this.$el);
                 this.init();
                 _this.modal('show');
+                setTimeout(() => {
+                _this.find('input.tel').focus();
+
+                },400)
             },
             login: function (e) {
                 var btn_login = $(e.target);

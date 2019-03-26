@@ -10,5 +10,9 @@
   {
     "outputFile": "css/user.css",
     "inputFile": "css/user.less"
+  },
+  {
+    "outputFile": "css/orderdetails.css",
+    "inputFile": "css/orderdetails.less"
   }
 ]

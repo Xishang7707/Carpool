@@ -75,5 +75,17 @@ namespace API.DAL
                 return false;
             return true;
         }
+        /// <summary>
+        /// 修改密码
+        /// </summary>
+        /// <param name="us_id">用户id</param>
+        /// <param name="password">新密码</param>
+        /// <returns></returns>
+        public static bool UpdatePassword(string us_id, string password)
+        {
+            string cmd = @"update [User] set password=@password where id=@id";
+            int result = DBHelper.Exec(cmd, "@password", password, "@id", us_id);
+            return result > 0;
+        }
     }
 }

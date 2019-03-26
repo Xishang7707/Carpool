@@ -191,7 +191,7 @@
                     return;
                 }
 
-                if (this.paytype == 2 && isNaN(parseFloat(''))) {
+                if (this.paytype == 2 && isNaN(parseFloat(this.price))) {
                     alert_error_tip($(".container.page-2"), '请填写好价格');
                     return;
                 }

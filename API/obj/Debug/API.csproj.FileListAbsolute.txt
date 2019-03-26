@@ -73,4 +73,3 @@ E:\Visual Studio 2017 Projects\Carpool\API\obj\Debug\API.csproj.CoreCompileInput
 E:\Visual Studio 2017 Projects\Carpool\API\obj\Debug\API.csproj.CopyComplete
 E:\Visual Studio 2017 Projects\Carpool\API\obj\Debug\API.dll
 E:\Visual Studio 2017 Projects\Carpool\API\obj\Debug\API.pdb
-E:\Visual Studio 2017 Projects\Carpool\API\obj\Debug\API.csprojAssemblyReference.cache
