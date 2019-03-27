@@ -120,6 +120,7 @@
     <Content Include="Script\jquery-3.2.1.min.js" />
     <Content Include="Script\jquery.cookie-1.4.1.min.js" />
     <Content Include="Script\login.js" />
+    <Content Include="Script\notify.js" />
     <Content Include="Script\orderdetails.js" />
     <Content Include="Script\popper.min.js" />
     <Content Include="Script\register.js" />

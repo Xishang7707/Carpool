@@ -231,5 +231,39 @@ namespace API.API
                 return SendData(400, "请求错误");
             }
         }
+        /// <summary>
+        /// 实名认证
+        /// </summary>
+        /// <param name="in_data"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JObject Verified(dynamic in_data)
+        {
+            try
+            {
+                JObject data = JObject.Parse(in_data.ToString());
+                string us_id = data["CarpoolSSID"].ToString();
+                string name = data["name"].ToString();
+                string idcard = data["idcard"].ToString();
+                if (us_id == null || Session["CarpoolSSID"]?.ToString() != us_id)
+                {
+                    return SendData(15001, "未授权访问");
+                }
+                if (us_id == "" || idcard.Length != 18)
+                    return SendData(400, "请求错误");
+
+                if (UserDAL.HasVerified(idcard))
+                    return SendData(15010, "身份证号已经被登记");
+
+                bool result = UserDAL.Verified(us_id, name, idcard);
+                if (!result)
+                    return SendData(-1, "修改失败");
+                return SendData(200, "密码修改成功,请使用新密码登录");
+            }
+            catch (Exception e)
+            {
+                return SendData(400, "请求错误");
+            }
+        }
     }
 }

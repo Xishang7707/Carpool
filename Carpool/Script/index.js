@@ -44,6 +44,97 @@
         })
     });
     /*     乘客     */
+    //打车
+    var perList = new Vue({
+        el: "#customer-list",
+        data: {
+            customer_list: '',
+            startplace: "",
+            endplace: "",
+            searchcondition: {
+                curpage: 1,
+                pagecount: 10,
+                pages: 1,
+                startplace: "",
+                endplace: "",
+                identity: 1
+            }
+        },
+        methods: {
+            refresh: function () {
+                this.resetsearch_data();
+                senddata({
+                    url: api_url + 'carpool/searchlist',
+                    data: this.searchcondition,
+                    call: (in_data) => {
+                        if (in_data['code'] == 200) {
+                            data = in_data['data'];
+                            this.customer_list = data['data'];
+                            this.searchcondition.pages = data['pages'];
+                        }
+                    }
+                })
+            },
+            resetsearch_data: function () {
+                this.searchcondition.curpage = 1;
+                this.searchcondition.pagecount = 5;
+                this.searchcondition.pages = 1;
+                this.searchcondition.startplace = '';
+                this.searchcondition.endplace = '';
+                this.searchcondition.identity = 1;
+            },
+            setsearchcondition: function (condition) {
+
+                for (var item in condition)
+                    this.searchcondition[item] = condition[item];
+
+                //this.setsearchcondition.startplace = $(this.$el).find('.startplace').val();
+                //this.setsearchcondition.endplace = $(this.$el).find('.endplace').val();
+            },
+            btn_search: function () {
+                this.resetsearch_data();
+                this.setsearchcondition({
+                    'startplace': $(this.$el).find('.startplace').val(),
+                    'endplace': $(this.$el).find('.endplace').val()
+                });
+                this.search();
+            },
+            search: function () {
+                senddata({
+                    url: api_url + 'carpool/searchlist',
+                    data: this.searchcondition,
+                    call: (in_data) => {
+                        if (in_data['code'] == 200) {
+                            data = in_data['data'];
+                            this.customer_list = data['data'];
+                            this.searchcondition.pages = data['pages'];
+                        }
+                    }
+                })
+            },
+            page_prev: function () {
+                this.setsearchcondition({
+                    'curpage': this.searchcondition['curpage'] - 1
+                });
+                this.search();
+            },
+            page_next: function () {
+                this.setsearchcondition({
+                    'curpage': this.searchcondition['curpage'] + 1
+                });
+                this.search();
+            },
+            page_number_search: function (page_id) {
+                this.setsearchcondition({
+                    'curpage': page_id
+                });
+                this.search();
+            },
+            format_date: function (time, fmt) {
+                return new Date(time).format(fmt);
+            }
+        }
+    }).refresh();
     //上下班
     new Vue({
         el: "#customer-work",
@@ -133,6 +224,7 @@
                             alert_error_tip($(".container.page-2"), in_data['msg'])
                             Login_Show(logined);
                         } else if (in_data['code'] == 200) {
+                            
                             this.clear_data();
                             alert_success_tip($(".container.page-2"), in_data['msg']);
                         } else alert_error_tip($(".container.page-2"), in_data['msg'])
@@ -226,6 +318,7 @@
                             alert_error_tip($(".container.page-2"), in_data['msg'])
                             Login_Show(logined);
                         } else if (in_data['code'] == 200) {
+                            
                             this.clear_data();
                             alert_success_tip($(".container.page-2"), in_data['msg']);
                         } else alert_error_tip($(".container.page-2"), in_data['msg'])
@@ -235,11 +328,15 @@
         }
     }).init();
 
-    //打车
-    new Vue({
-        el: "#customer-list",
+
+
+    /*     司机     */
+
+    //拉客
+    var carLisst = new Vue({
+        el: "#driver-list",
         data: {
-            customer_list: '',
+            driver_list: '',
             startplace: "",
             endplace: "",
             searchcondition: {
@@ -248,23 +345,24 @@
                 pages: 1,
                 startplace: "",
                 endplace: "",
-                identity: 1
+                identity: 0
             }
         },
         methods: {
             refresh: function () {
                 this.resetsearch_data();
-                senddata({
-                    url: api_url + 'carpool/searchlist',
-                    data: this.searchcondition,
-                    call: (in_data) => {
-                        if (in_data['code'] == 200) {
-                            data = in_data['data'];
-                            this.customer_list = data['data'];
-                            this.searchcondition.pages = data['pages'];
-                        }
-                    }
-                })
+                this.search();
+                //senddata({
+                //    url: api_url + 'carpool/searchlist',
+                //    data: this.searchcondition,
+                //    call: (in_data) => {
+                //        if (in_data['code'] == 200) {
+                //            data = in_data['data'];
+                //            this.driver_list = data['data'];
+                //            this.searchcondition.pages = data['pages'];
+                //        }
+                //    }
+                //})
             },
             resetsearch_data: function () {
                 this.searchcondition.curpage = 1;
@@ -272,7 +370,7 @@
                 this.searchcondition.pages = 1;
                 this.searchcondition.startplace = '';
                 this.searchcondition.endplace = '';
-                this.searchcondition.identity = 1;
+                this.searchcondition.identity = 0;
             },
             setsearchcondition: function (condition) {
 
@@ -297,7 +395,7 @@
                     call: (in_data) => {
                         if (in_data['code'] == 200) {
                             data = in_data['data'];
-                            this.customer_list = data['data'];
+                            this.driver_list = data['data'];
                             this.searchcondition.pages = data['pages'];
                         }
                     }
@@ -326,8 +424,6 @@
             }
         }
     }).refresh();
-
-    /*     司机     */
     //上下班
     new Vue({
         el: "#driver-work",
@@ -419,6 +515,7 @@
                             alert_error_tip($(".container.page-3"), '您不是司机，<a class="text-primary">申请成为司机</a>', 10000);
                             return;
                         } else if (in_data['code'] == 200) {
+                            
                             this.clear_data();
                             alert_success_tip($(".container.page-3"), in_data['msg']);
                         } else alert_error_tip($(".container.page-3"), in_data['msg'])
@@ -474,7 +571,7 @@
                     return;
                 }
 
-                if (this.paytype == 2 && isNaN(parseFloat(''))) {
+                if (this.paytype == 2 && isNaN(parseFloat(this.price))) {
                     alert_error_tip($(".container.page-3"), '请填写好价格');
                     return;
                 }
@@ -503,6 +600,7 @@
                             alert_error_tip($(".container.page-3"), in_data['msg'])
                             Login_Show(logined);
                         } else if (in_data['code'] == 200) {
+                            
                             this.clear_data();
                             alert_success_tip($(".container.page-3"), in_data['msg']);
                         } else alert_error_tip($(".container.page-3"), in_data['msg'])
@@ -512,96 +610,4 @@
         }
     }).init();
 
-    //拉客
-    new Vue({
-        el: "#driver-list",
-        data: {
-            driver_list: '',
-            startplace: "",
-            endplace: "",
-            searchcondition: {
-                curpage: 1,
-                pagecount: 10,
-                pages: 1,
-                startplace: "",
-                endplace: "",
-                identity: 0
-            }
-        },
-        methods: {
-            refresh: function () {
-                this.resetsearch_data();
-                this.search();
-                //senddata({
-                //    url: api_url + 'carpool/searchlist',
-                //    data: this.searchcondition,
-                //    call: (in_data) => {
-                //        if (in_data['code'] == 200) {
-                //            data = in_data['data'];
-                //            this.driver_list = data['data'];
-                //            this.searchcondition.pages = data['pages'];
-                //        }
-                //    }
-                //})
-            },
-            resetsearch_data: function () {
-                this.searchcondition.curpage = 1;
-                this.searchcondition.pagecount = 5;
-                this.searchcondition.pages = 1;
-                this.searchcondition.startplace = '';
-                this.searchcondition.endplace = '';
-                this.searchcondition.identity = 0;
-            },
-            setsearchcondition: function (condition) {
-
-                for (var item in condition)
-                    this.searchcondition[item] = condition[item];
-
-                //this.setsearchcondition.startplace = $(this.$el).find('.startplace').val();
-                //this.setsearchcondition.endplace = $(this.$el).find('.endplace').val();
-            },
-            btn_search: function () {
-                this.resetsearch_data();
-                this.setsearchcondition({
-                    'startplace': $(this.$el).find('.startplace').val(),
-                    'endplace': $(this.$el).find('.endplace').val()
-                });
-                this.search();
-            },
-            search: function () {
-                senddata({
-                    url: api_url + 'carpool/searchlist',
-                    data: this.searchcondition,
-                    call: (in_data) => {
-                        if (in_data['code'] == 200) {
-                            data = in_data['data'];
-                            this.driver_list = data['data'];
-                            this.searchcondition.pages = data['pages'];
-                        }
-                    }
-                })
-            },
-            page_prev: function () {
-                this.setsearchcondition({
-                    'curpage': this.searchcondition['curpage'] - 1
-                });
-                this.search();
-            },
-            page_next: function () {
-                this.setsearchcondition({
-                    'curpage': this.searchcondition['curpage'] + 1
-                });
-                this.search();
-            },
-            page_number_search: function (page_id) {
-                this.setsearchcondition({
-                    'curpage': page_id
-                });
-                this.search();
-            },
-            format_date: function (time, fmt) {
-                return new Date(time).format(fmt);
-            }
-        }
-    }).refresh();
 })

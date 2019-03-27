@@ -133,6 +133,7 @@
     <Compile Include="API\CarpoolController.cs" />
     <Compile Include="API\CarsController.cs" />
     <Compile Include="API\CommunicationController.cs" />
+    <Compile Include="API\NotificationController.cs" />
     <Compile Include="API\UsersController.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />

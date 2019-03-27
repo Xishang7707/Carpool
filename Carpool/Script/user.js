@@ -149,6 +149,55 @@
             }
         }
     })
+    //实名认证
+    var menu_user_verified = new Vue({
+        el: "#menu-user-verified",
+        data: {
+            name: '',
+            idcard: '',
+            userinfo: ''
+        },
+        methods: {
+            init: function () {
+                this.name = '';
+                this.idcard = '';
+                this.userinfo = '';
+
+                senddata({
+                    url: api_url + 'users/getinfo',
+                    data: { 'CarpoolSSID': $.cookie('CarpoolSSID') },
+                    call: (in_data) => {
+                        if (in_data['code'] == 200) {
+                            this.userinfo = in_data['data'];
+                        } else alert_error_tip($(this.$el), "加载失败，请刷新");
+                    }
+                })
+            },
+            verified: function (e) {
+                var _this = $(e.target);
+                _this.prop('disabled', true);
+                if (this.name == '' || this.idcard.length != 18) {
+                    alert_error_tip($(this.$el), "信息填写错误");
+                    _this.prop('disabled', false);
+                    return;
+                }
+
+                senddata({
+                    url: api_url + 'users/verified',
+                    data: { 'CarpoolSSID': $.cookie('CarpoolSSID'), 'name': this.name, 'idcard': this.idcard },
+                    call: (in_data) => {
+                        if (in_data['code'] == 200) {
+                            alert_success_tip($(this.$el), '实名成功');
+                            this.init();
+                        } else {
+                            alert_error_tip($(this.$el), in_data['msg']);
+                            _this.prop('disabled', false);
+                        }
+                    }
+                })
+            }
+        }
+    });
     //成为司机
     var menu_user_car = new Vue({
         el: '#menu-user-car',
@@ -156,9 +205,44 @@
             carname: '',
             caridcard: '',
             cartype: -1,
-            capacity: ''
+            capacity: '',
+            carinfo: ''
         },
         methods: {
+            init: function () {
+                this.carname = '';
+                this.caridcard = '';
+                this.cartype = -1;
+                this.capacity = '';
+
+                senddata({
+                    url: api_url + 'users/getinfo',
+                    data: { 'CarpoolSSID': $.cookie('CarpoolSSID') },
+                    call: (in_data) => {
+                        if (in_data['code'] == 200) {
+                            console.log(in_data);
+                            if (in_data['data']['name'] == null || in_data['data']['name'] == '')
+                                dialog_ok({
+                                    title: '提示',
+                                    content: '请先实名认证后才能注册成为司机',
+                                    ok_call: () => {
+                                        location.reload();
+                                    }
+                                })
+                            else
+                                senddata({
+                                    url: api_url + 'users/menu_user_info',
+                                    data: { 'CarpoolSSID': $.cookie('CarpoolSSID') },
+                                    call: (in_data) => {
+                                        if (in_data['code'] == 200) {
+                                            this.carinfo = in_data['data']['car'];
+                                        }
+                                    }
+                                })
+                        } else alert_error_tip($(this.$el), "加载失败，请刷新");
+                    }
+                })
+            },
             applycar: function (e) {
                 $(e.target).prop('disabled', true);
                 if (this.carname == '' ||
@@ -186,8 +270,9 @@
                             }, 2000);
                         } else {
                             $(e.target).prop('disabled', false);
-                            alert_error_tip($(this.$el), in_data['msg'])
+                            alert_error_tip($(this.$el), in_data['msg']);
                         }
+
                     }
                 })
             }
@@ -197,28 +282,36 @@
     var menu_order_all = new Vue({
         el: "#menu-order-all",
         data: {
-            curpage: 1,
-            pagecount: 5,
-            pages: 1,
             orderlist: "",
+            searchcondition: {
+                curpage: 1,
+                pagecount: 10,
+                pages: 1,
+                startplace: "",
+                endplace: "",
+                identity: 0
+            },
             us_id: $.cookie("CarpoolSSID")
         },
         methods: {
             init: function () {
-                this.curpage = 1;
-                this.pages = 1;
-                this.pagecount = 5;
+                //this.curpage = 1;
+                //this.pages = 1;
+                //this.pagecount = 5;
                 this.orderlist = "";
+                this.getdata();
             },
             getdata: function () {
                 senddata({
                     url: api_url + 'carpool/getuserorderall',
-                    data: { 'curpage': this.curpage, 'pagecount': this.pagecount, 'CarpoolSSID': $.cookie('CarpoolSSID') },
+                    data: { 'curpage': this.searchcondition['curpage'], 'pagecount': this.searchcondition['pagecount'], 'CarpoolSSID': $.cookie('CarpoolSSID') },
                     call: (in_data) => {
                         if (in_data['code'] == 200) {
                             var data = in_data['data'];
                             this.orderlist = data['data'];
-                            this.pages = data['pages'];
+                            this.$set(this.searchcondition, 'pages', data['pages']);
+                        } else if (in_data['code'] == 15001) {
+                            Login_Show(logined);
                         }
                     }
                 })
@@ -234,7 +327,8 @@
                     url: api_url + 'carpool/orderoperation',
                     data: { 'or_id': or_id, 'option': 0, 'CarpoolSSID': $.cookie('CarpoolSSID') },
                     call: (in_data) => {
-
+                        if (in_data['code'] == 200)
+                            this.getdata();
                     }
                 })
             },
@@ -243,7 +337,7 @@
                     url: api_url + 'carpool/orderoperation',
                     data: { 'or_id': or_id, 'ods_id': ods_id, 'option': 2, 'CarpoolSSID': $.cookie('CarpoolSSID') },
                     call: (in_data) => {
-                        if (in_data['code'] = 200)
+                        if (in_data['code'] == 200)
                             this.getdata();
                         else alert_error_tip($("#menu-order-all"), in_data['status']);
                     }
@@ -254,9 +348,19 @@
                     url: api_url + 'carpool/orderoperation',
                     data: { 'or_id': or_id, 'ods_id': ods_id, 'option': 3, 'CarpoolSSID': $.cookie('CarpoolSSID') },
                     call: (in_data) => {
-                        if (in_data['code'] = 200)
+                        if (in_data['code'] == 200)
                             this.getdata();
                         else alert_error_tip($("#menu-order-all"), in_data['status']);
+                    }
+                })
+            }, closeOrder: function (or_id) {
+                senddata({
+                    url: api_url + 'carpool/orderoperation',
+                    data: { 'or_id': or_id, 'option': 1, 'CarpoolSSID': $.cookie('CarpoolSSID') },
+                    call: (in_data) => {
+                        if (in_data['code'] = 200)
+                            this.getdata();
+                        else alert_error_tip($("#menu-order-processing"), in_data['status']);
                     }
                 })
             },
@@ -265,9 +369,72 @@
                     url: api_url + 'carpool/orderoperation',
                     data: { 'or_id': or_id, 'option': 0, 'CarpoolSSID': $.cookie('CarpoolSSID') },
                     call: (in_data) => {
-                        if (in_data['code'] = 200)
+                        if (in_data['code'] == 200)
                             this.getdata();
                         else alert_error_tip($("#menu-order-all"), in_data['status']);
+                    }
+                })
+            },
+            setsearchcondition: function (condition) {
+
+                for (var item in condition)
+                    this.searchcondition[item] = condition[item];
+
+            },
+            page_prev: function () {
+                this.setsearchcondition({
+                    'curpage': this.searchcondition['curpage'] - 1
+                });
+                this.getdata();
+            },
+            page_next: function () {
+                this.setsearchcondition({
+                    'curpage': this.searchcondition['curpage'] + 1
+                });
+                this.getdata();
+            },
+            page_number_search: function (page_id) {
+                this.setsearchcondition({
+                    'curpage': page_id
+                });
+                this.getdata();
+            },
+            acceptApply: function (or_id, ods_id) {
+                senddata({
+                    url: api_url + 'carpool/orderoperation',
+                    data: { 'CarpoolSSID': $.cookie('CarpoolSSID'), 'option': 4, 'or_id': or_id, 'ods_id': ods_id },
+                    call: (in_data) => {
+                        if (in_data['code'] == 200) {
+                            this.init();
+                        } else {
+                            alert_error_tip($(this.$el), in_data['msg']);
+                        }
+                    }
+                })
+            },
+            disacceptApply: function (or_id, ods_id) {
+                senddata({
+                    url: api_url + 'carpool/orderoperation',
+                    data: { 'CarpoolSSID': $.cookie('CarpoolSSID'), 'option': 5, 'or_id': or_id, 'ods_id': ods_id },
+                    call: (in_data) => {
+                        if (in_data['code'] == 200) {
+                            this.init();
+                        } else {
+                            alert_error_tip($(this.$el), in_data['msg']);
+                        }
+                    }
+                })
+            },
+            payfor: function (ods_id) {
+                senddata({
+                    url: api_url + 'carpool/payfor',
+                    data: { 'CarpoolSSID': $.cookie('CarpoolSSID'), 'ods_id': ods_id },
+                    call: (in_data) => {
+                        if (in_data['code'] == 200) {
+                            alert_success_tip($(this.$el), "支付成功");
+                            this.init();
+                        }
+                        else alert_error_tip($(this.$el), in_data['msg']);
                     }
                 })
             }
@@ -277,28 +444,32 @@
     var menu_order_processing = new Vue({
         el: "#menu-order-processing",
         data: {
-            curpage: 1,
-            pagecount: 5,
-            pages: 1,
+            searchcondition: {
+                curpage: 1,
+                pagecount: 10,
+                pages: 1,
+                startplace: "",
+                endplace: "",
+                identity: 0
+            },
             orderlist: "",
             us_id: $.cookie("CarpoolSSID")
         },
         methods: {
             init: function () {
-                this.curpage = 1;
-                this.pages = 1;
-                this.pagecount = 5;
                 this.orderlist = "";
+
+                this.getdata();
             },
             getdata: function () {
                 senddata({
                     url: api_url + 'carpool/getuserorderprocessing',
-                    data: { 'curpage': this.curpage, 'pagecount': this.pagecount, 'CarpoolSSID': $.cookie('CarpoolSSID') },
+                    data: { 'curpage': this.searchcondition['curpage'], 'pagecount': this.searchcondition['pagecount'], 'CarpoolSSID': $.cookie('CarpoolSSID') },
                     call: (in_data) => {
                         if (in_data['code'] == 200) {
                             var data = in_data['data'];
                             this.orderlist = data['data'];
-                            this.pages = data['pages'];
+                            this.$set(this.searchcondition, 'pages', data['pages']);
                         }
                     }
                 })
@@ -314,7 +485,9 @@
                     url: api_url + 'carpool/orderoperation',
                     data: { 'or_id': or_id, 'option': 0, 'CarpoolSSID': $.cookie('CarpoolSSID') },
                     call: (in_data) => {
-
+                        if (in_data['code'] == 200) {
+                            this.getdata();
+                        }
                     }
                 })
             },
@@ -323,7 +496,7 @@
                     url: api_url + 'carpool/orderoperation',
                     data: { 'or_id': or_id, 'ods_id': ods_id, 'option': 2, 'CarpoolSSID': $.cookie('CarpoolSSID') },
                     call: (in_data) => {
-                        if (in_data['code'] = 200)
+                        if (in_data['code'] == 200)
                             this.getdata();
                         else alert_error_tip($("#menu-order-processing"), in_data['status']);
                     }
@@ -333,6 +506,17 @@
                 senddata({
                     url: api_url + 'carpool/orderoperation',
                     data: { 'or_id': or_id, 'ods_id': ods_id, 'option': 3, 'CarpoolSSID': $.cookie('CarpoolSSID') },
+                    call: (in_data) => {
+                        if (in_data['code'] == 200)
+                            this.getdata();
+                        else alert_error_tip($("#menu-order-processing"), in_data['status']);
+                    }
+                })
+            },
+            closeOrder: function (or_id) {
+                senddata({
+                    url: api_url + 'carpool/orderoperation',
+                    data: { 'or_id': or_id, 'option': 1, 'CarpoolSSID': $.cookie('CarpoolSSID') },
                     call: (in_data) => {
                         if (in_data['code'] = 200)
                             this.getdata();
@@ -345,9 +529,72 @@
                     url: api_url + 'carpool/orderoperation',
                     data: { 'or_id': or_id, 'option': 0, 'CarpoolSSID': $.cookie('CarpoolSSID') },
                     call: (in_data) => {
-                        if (in_data['code'] = 200)
+                        if (in_data['code'] == 200)
                             this.getdata();
                         else alert_error_tip($("#menu-order-processing"), in_data['status']);
+                    }
+                })
+            },
+            setsearchcondition: function (condition) {
+
+                for (var item in condition)
+                    this.searchcondition[item] = condition[item];
+
+            },
+            page_prev: function () {
+                this.setsearchcondition({
+                    'curpage': this.searchcondition['curpage'] - 1
+                });
+                this.getdata();
+            },
+            page_next: function () {
+                this.setsearchcondition({
+                    'curpage': this.searchcondition['curpage'] + 1
+                });
+                this.getdata();
+            },
+            page_number_search: function (page_id) {
+                this.setsearchcondition({
+                    'curpage': page_id
+                });
+                this.getdata();
+            },
+            acceptApply: function (or_id, ods_id) {
+                senddata({
+                    url: api_url + 'carpool/orderoperation',
+                    data: { 'CarpoolSSID': $.cookie('CarpoolSSID'), 'option': 4, 'or_id': or_id, 'ods_id': ods_id },
+                    call: (in_data) => {
+                        if (in_data['code'] == 200) {
+                            this.init();
+                        } else {
+                            alert_error_tip($(this.$el), in_data['msg']);
+                        }
+                    }
+                })
+            },
+            disacceptApply: function (or_id, ods_id) {
+                senddata({
+                    url: api_url + 'carpool/orderoperation',
+                    data: { 'CarpoolSSID': $.cookie('CarpoolSSID'), 'option': 5, 'or_id': or_id, 'ods_id': ods_id },
+                    call: (in_data) => {
+                        if (in_data['code'] == 200) {
+                            this.init();
+                        } else {
+                            alert_error_tip($(this.$el), in_data['msg']);
+                        }
+                    }
+                })
+            },
+            payfor: function (ods_id) {
+                senddata({
+                    url: api_url + 'carpool/payfor',
+                    data: { 'CarpoolSSID': $.cookie('CarpoolSSID'), 'ods_id': ods_id },
+                    call: (in_data) => {
+                        if (in_data['code'] == 200) {
+                            alert_success_tip($(this.$el), "支付成功");
+                            this.init();
+                        }
+                        else alert_error_tip($(this.$el), in_data['msg']);
                     }
                 })
             }
@@ -357,28 +604,32 @@
     var menu_order_completed = new Vue({
         el: "#menu-order-completed",
         data: {
-            curpage: 1,
-            pagecount: 5,
-            pages: 1,
+            searchcondition: {
+                curpage: 1,
+                pagecount: 10,
+                pages: 1,
+                startplace: "",
+                endplace: "",
+                identity: 0
+            },
             orderlist: "",
             us_id: $.cookie("CarpoolSSID")
         },
         methods: {
             init: function () {
-                this.curpage = 1;
-                this.pages = 1;
-                this.pagecount = 5;
                 this.orderlist = "";
+
+                this.getdata();
             },
             getdata: function () {
                 senddata({
                     url: api_url + 'carpool/getuserordercompleted',
-                    data: { 'curpage': this.curpage, 'pagecount': this.pagecount, 'CarpoolSSID': $.cookie('CarpoolSSID') },
+                    data: { 'curpage': this.searchcondition['curpage'], 'pagecount': this.searchcondition['pagecount'], 'CarpoolSSID': $.cookie('CarpoolSSID') },
                     call: (in_data) => {
                         if (in_data['code'] == 200) {
                             var data = in_data['data'];
                             this.orderlist = data['data'];
-                            this.pages = data['pages'];
+                            this.$set(this.searchcondition, 'pages', data['pages']);
                         }
                     }
                 })
@@ -420,6 +671,17 @@
                     }
                 })
             },
+            closeOrder: function (or_id) {
+                senddata({
+                    url: api_url + 'carpool/orderoperation',
+                    data: { 'or_id': or_id, 'option': 1, 'CarpoolSSID': $.cookie('CarpoolSSID') },
+                    call: (in_data) => {
+                        if (in_data['code'] = 200)
+                            this.getdata();
+                        else alert_error_tip($("#menu-order-processing"), in_data['status']);
+                    }
+                })
+            },
             completeOrder: function (or_id) {
                 senddata({
                     url: api_url + 'carpool/orderoperation',
@@ -430,10 +692,193 @@
                         else alert_error_tip($("#menu-order-processing"), in_data['status']);
                     }
                 })
+            },
+            setsearchcondition: function (condition) {
+
+                for (var item in condition)
+                    this.searchcondition[item] = condition[item];
+
+            },
+            page_prev: function () {
+                this.setsearchcondition({
+                    'curpage': this.searchcondition['curpage'] - 1
+                });
+                this.getdata();
+            },
+            page_next: function () {
+                this.setsearchcondition({
+                    'curpage': this.searchcondition['curpage'] + 1
+                });
+                this.getdata();
+            },
+            page_number_search: function (page_id) {
+                this.setsearchcondition({
+                    'curpage': page_id
+                });
+                this.getdata();
+            },
+            acceptApply: function (or_id, ods_id) {
+                senddata({
+                    url: api_url + 'carpool/orderoperation',
+                    data: { 'CarpoolSSID': $.cookie('CarpoolSSID'), 'option': 4, 'or_id': or_id, 'ods_id': ods_id },
+                    call: (in_data) => {
+                        if (in_data['code'] == 200) {
+                            this.init();
+                        } else {
+                            alert_error_tip($(this.$el), in_data['msg']);
+                        }
+                    }
+                })
+            },
+            disacceptApply: function (or_id, ods_id) {
+                senddata({
+                    url: api_url + 'carpool/orderoperation',
+                    data: { 'CarpoolSSID': $.cookie('CarpoolSSID'), 'option': 5, 'or_id': or_id, 'ods_id': ods_id },
+                    call: (in_data) => {
+                        if (in_data['code'] == 200) {
+                            this.init();
+                        } else {
+                            alert_error_tip($(this.$el), in_data['msg']);
+                        }
+                    }
+                })
+            },
+            payfor: function (ods_id) {
+                senddata({
+                    url: api_url + 'carpool/payfor',
+                    data: { 'CarpoolSSID': $.cookie('CarpoolSSID'), 'ods_id': ods_id },
+                    call: (in_data) => {
+                        if (in_data['code'] == 200) {
+                            alert_success_tip($(this.$el), "支付成功");
+                            this.init();
+                        }
+                        else alert_error_tip($(this.$el), in_data['msg']);
+                    }
+                })
+            }
+        }
+    })
+    //全部通知
+    var menu_notice_all = new Vue({
+        el: "#menu-notice-all",
+        data: {
+            instance: $(this.$el),
+            datalist: '',
+            searchcondition: {
+                curpage: 1,
+                pagecount: 10,
+                pages: 1,
+                startplace: "",
+                endplace: "",
+                identity: 0
+            },
+            us_id: $.cookie("CarpoolSSID")
+        },
+        methods: {
+            refresh: function () {
+                this.searchcondition = {
+                    curpage: 1,
+                    pagecount: 10,
+                    pages: 1,
+                    startplace: "",
+                    endplace: "",
+                    identity: 0
+                };
+
+                this.getdata();
+            },
+            getdata: function () {
+                senddata({
+                    url: api_url + 'notification/getnoticeall',
+                    data: { 'pagecount': this.searchcondition['pagecount'], 'curpage': this.searchcondition['curpage'], 'CarpoolSSID': $.cookie("CarpoolSSID") },
+                    call: (in_data) => {
+                        if (in_data['code'] == 200) {
+                            var data = in_data['data'];
+                            this.datalist = data['data'];
+
+                            this.$set(this.searchcondition, 'pages', data['pages']);
+                        } else {
+                            alert_error_tip($(document.body), in_data['msg']);
+                        }
+                    }
+                })
+            },
+            setsearchcondition: function (condition) {
+
+                for (var item in condition)
+                    this.searchcondition[item] = condition[item];
+
+            },
+            page_prev: function () {
+                this.setsearchcondition({
+                    'curpage': this.searchcondition['curpage'] - 1
+                });
+                this.getdata();
+            },
+            page_next: function () {
+                this.setsearchcondition({
+                    'curpage': this.searchcondition['curpage'] + 1
+                });
+                this.getdata();
+            },
+            page_number_search: function (page_id) {
+                this.setsearchcondition({
+                    'curpage': page_id
+                });
+                this.getdata();
+            },
+            dataformat: function (t, fmt) {
+                return new Date(t).format(fmt);
+            },
+            notice_list_toggle: function (nt_id, nt_data, e) {
+                $("#notice-list-all-" + nt_id).collapse('toggle');
+
+                this.notice_deal(nt_id, nt_data);
+            },
+            notice_deal: function (nt_id, nt_data) {
+                if (nt_data['is_deal'] == 1)
+                    return;
+
+                senddata({
+                    url: api_url + 'notification/noticedeal',
+                    data: { 'CarpoolSSID': $.cookie('CarpoolSSID'), 'nt_id': nt_id },
+                    call: (in_data) => {
+
+                    }
+                })
             }
         }
     })
 
+    var menu_manager = new Vue({
+        el: "#menu-manager",
+        methods: {
+            menu_user_info_refresh: function () {
+                menu_user_info.init();
+            },
+            menu_user_updatepassword_refresh: function () {
+                menu_user_updatepassword.init();
+            },
+            menu_user_verified_refresh: function () {
+                menu_user_verified.init();
+            },
+            menu_user_car_refresh: function () {
+                menu_user_car.init();
+            },
+            menu_order_all_refresh: function () {
+                menu_order_all.init();
+            },
+            menu_order_processing_refresh: function () {
+                menu_order_processing.init();
+            },
+            menu_order_completed_refresh: function () {
+                menu_order_completed.init();
+            },
+            menu_notice_all_refresh: function () {
+                menu_notice_all.refresh();
+            }
+        }
+    })
 
     function logined() {
         if (!islogin())
@@ -485,4 +930,14 @@
             loginout();
         })
     });
+
+
+    var tab = getQuery("menu");
+    if (tab == null)
+        return;
+    switch (tab) {
+        case "notice-all":
+
+            break;
+    }
 })

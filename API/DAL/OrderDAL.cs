@@ -122,17 +122,18 @@ namespace API.DAL
 
             JArray or_jarr = DBHelper.GetData(cmd, "@us_id", us_id, "@passcount", passcount, "@pagecount", pagecount);
 
-            string cmd_ods = @"select * from [OrderDetails] ods where or_id=@or_id and (or_state=0 or or_state=1) order by [identity] desc";
+            string cmd_ods = @"select * from [OrderDetails] ods where or_id=@or_id and (or_state=0 or or_state=1 or or_state=15) order by [identity] desc";
             JArray search_jarr = new JArray();
 
             foreach (JObject item in or_jarr)
             {
                 JObject json = new JObject();
                 json.Add("order", item);
-                json.Add("user", UserDAL.GetInfo(item["us_id"].ToString()));
+                //json.Add("user", UserDAL.GetInfo(item["us_id"].ToString()));
                 JObject ods_json = OrderDAL.GetOrderDetailsInfo(item["or_id"].ToString(), item["us_id"].ToString());
                 json.Add("orderdetail", ods_json);
-                json.Add("owner", OrderDAL.GetOrderDetailsInfo(item["or_id"].ToString(), us_id));
+                JObject owner = OrderDAL.GetOrderDetailsInfo(item["or_id"].ToString(), us_id);
+                json.Add("owner", owner);
                 JObject carus_tmp = OrderDAL.GetOrderCar(item["or_id"].ToString());
                 JObject carus = new JObject();
                 if (carus_tmp != null)
@@ -145,10 +146,15 @@ namespace API.DAL
                 json.Add("carus", carus_tmp == null ? null : carus);
                 JArray ord_jarr = DBHelper.GetData(cmd_ods, "@or_id", item["or_id"].ToString());
                 JArray info_jarr = new JArray();
-                if (ods_json["identity"].ToString() == "1" && ods_json["us_id"].ToString() == us_id)
+                //if (ods_json["identity"].ToString() == "1" && ods_json["us_id"].ToString() == us_id)
                 {
                     foreach (JObject tmp in ord_jarr)
                     {
+                        if (tmp["us_id"].ToString() == us_id)
+                            continue;
+                        if (owner["identity"].ToString() == "0" && tmp["identity"].ToString() == "0")
+                            continue;
+
                         JObject us_json = UserDAL.GetInfo(tmp["us_id"].ToString());
                         us_json.Remove("password");
                         us_json.Remove("idcard");
@@ -167,7 +173,7 @@ namespace API.DAL
 
                 search_jarr.Add(json);
             }
-            int count = GetAllCount(us_id);
+            int count = GetProcessingCount(us_id);
             int pages = count / pagecount + (count % pagecount > 0 ? 1 : 0);
             JObject ret_json = new JObject();
             ret_json.Add("data", search_jarr);
@@ -183,7 +189,7 @@ namespace API.DAL
         public static int GetProcessingCount(string us_id)
         {
             CheckAvailability();
-            string cmd = @"select COUNT(*) as cnt from [Order] od, [OrderDetails] ods where od.or_id=ods.or_id and (od.us_id=@us_id or ods.us_id=@us_id) and (ods.or_state=0 or ods.or_state=1)";
+            string cmd = @"select COUNT(*) as cnt from [OrderDetails] ods where ods.us_id=@us_id and (ods.or_state=0 or ods.or_state=1)";
             JArray or_jarr = DBHelper.GetData(cmd, "@us_id", us_id);
 
             return int.Parse(or_jarr[0]["cnt"].ToString());
@@ -195,6 +201,7 @@ namespace API.DAL
         ///20 完成
         ///30 被关闭
         ///31 关闭
+        ///32 拒绝申请
         ///40 过期
         /// <summary>
         /// 获取所有订单
@@ -212,17 +219,18 @@ namespace API.DAL
 
             JArray or_jarr = DBHelper.GetData(cmd, "@us_id", us_id, "@passcount", passcount, "@pagecount", pagecount);
 
-            string cmd_ods = @"select * from [OrderDetails] ods where or_id=@or_id and (or_state=0 or or_state=1 or or_state=10) order by [identity] desc";
+            string cmd_ods = @"select * from [OrderDetails] ods where or_id=@or_id and (or_state=0 or or_state=1 or or_state=10 or or_state=15) order by [identity] desc";
             JArray search_jarr = new JArray();
 
             foreach (JObject item in or_jarr)
             {
                 JObject json = new JObject();
                 json.Add("order", item);
-                json.Add("user", UserDAL.GetInfo(item["us_id"].ToString()));
+                //json.Add("user", UserDAL.GetInfo(item["us_id"].ToString()));
                 JObject ods_json = OrderDAL.GetOrderDetailsInfo(item["or_id"].ToString(), item["us_id"].ToString());
                 json.Add("orderdetail", ods_json);
-                json.Add("owner", OrderDAL.GetOrderDetailsInfo(item["or_id"].ToString(), us_id));
+                JObject owner = OrderDAL.GetOrderDetailsInfo(item["or_id"].ToString(), us_id);
+                json.Add("owner", owner);
                 JObject carus_tmp = OrderDAL.GetOrderCar(item["or_id"].ToString());
                 JObject carus = new JObject();
                 if (carus_tmp != null)
@@ -235,10 +243,18 @@ namespace API.DAL
                 json.Add("carus", carus_tmp == null ? null : carus);
                 JArray ord_jarr = DBHelper.GetData(cmd_ods, "@or_id", item["or_id"].ToString());
                 JArray info_jarr = new JArray();
-                if (ods_json["identity"].ToString() == "1" && ods_json["us_id"].ToString() == us_id)
+                //乘客列表
+                //ods_json["identity"].ToString()
+                //if (ods_json["us_id"].ToString() == us_id)
                 {
+
                     foreach (JObject tmp in ord_jarr)
                     {
+                        if (tmp["us_id"].ToString() == us_id)
+                            continue;
+                        if (owner["identity"].ToString() == "0" && tmp["identity"].ToString() == "0")
+                            continue;
+
                         JObject us_json = UserDAL.GetInfo(tmp["us_id"].ToString());
                         us_json.Remove("password");
                         us_json.Remove("idcard");
@@ -301,10 +317,11 @@ namespace API.DAL
             {
                 JObject json = new JObject();
                 json.Add("order", item);
-                json.Add("user", UserDAL.GetInfo(item["us_id"].ToString()));
+                //json.Add("user", UserDAL.GetInfo(item["us_id"].ToString()));
                 JObject ods_json = OrderDAL.GetOrderDetailsInfo(item["or_id"].ToString(), item["us_id"].ToString());
                 json.Add("orderdetail", ods_json);
-                json.Add("owner", OrderDAL.GetOrderDetailsInfo(item["or_id"].ToString(), us_id));
+                JObject owner = OrderDAL.GetOrderDetailsInfo(item["or_id"].ToString(), us_id);
+                json.Add("owner", owner);
                 JObject carus_tmp = OrderDAL.GetOrderCar(item["or_id"].ToString());
                 JObject carus = new JObject();
                 if (carus_tmp != null)
@@ -317,10 +334,15 @@ namespace API.DAL
                 json.Add("carus", carus_tmp == null ? null : carus);
                 JArray ord_jarr = DBHelper.GetData(cmd_ods, "@or_id", item["or_id"].ToString());
                 JArray info_jarr = new JArray();
-                if (ods_json["identity"].ToString() == "1" && ods_json["us_id"].ToString() == us_id)
+                //if (ods_json["identity"].ToString() == "1" && ods_json["us_id"].ToString() == us_id)
                 {
                     foreach (JObject tmp in ord_jarr)
                     {
+                        if (tmp["us_id"].ToString() == us_id)
+                            continue;
+                        if (owner["identity"].ToString() == "0" && tmp["identity"].ToString() == "0")
+                            continue;
+
                         JObject us_json = UserDAL.GetInfo(tmp["us_id"].ToString());
                         us_json.Remove("password");
                         us_json.Remove("idcard");
@@ -339,7 +361,7 @@ namespace API.DAL
 
                 search_jarr.Add(json);
             }
-            int count = GetAllCount(us_id);
+            int count = GetCompletedCount(us_id);
             int pages = count / pagecount + (count % pagecount > 0 ? 1 : 0);
             JObject ret_json = new JObject();
             ret_json.Add("data", search_jarr);
@@ -374,6 +396,16 @@ namespace API.DAL
                 return null;
             return JObject.FromObject(ods_jarr[0]);
         }
+
+        public static JObject GetOrderDetailsInfo(string ods_id)
+        {
+            CheckAvailability();
+            string cmd = @"select * from [OrderDetails] where ods_id=@ods_id";
+            JArray ods_jarr = DBHelper.GetData(cmd, "@ods_id", ods_id);
+            if (ods_jarr.Count == 0)
+                return null;
+            return JObject.FromObject(ods_jarr[0]);
+        }
         /// <summary>
         /// 完成订单
         /// </summary>
@@ -391,6 +423,35 @@ namespace API.DAL
             string cmd3 = @"update [OrderDetails] set or_state=40 where or_state=10 and or_id=@or_id";
             DBHelper.Exec(cmd3, "@or_id", or_id);
             return true;
+        }
+        /// <summary>
+        /// 关闭订单
+        /// </summary>
+        /// <param name="or_id">订单id</param>
+        /// <param name="us_id">用户id</param>
+        /// <returns></returns>
+        public static bool OrderClose(string or_id, string us_id)
+        {
+            JObject or_json = OrderDAL.GetInfo(or_id);
+            string cmd;
+            int flag = -1;
+            if (or_json["us_id"].ToString() == us_id)
+            {
+                cmd = @"update [OrderDetails] set or_state=30 where or_id=@or_id";
+                flag = 0;
+            }
+            else
+            {
+                cmd = @"update [OrderDetails] set or_state=30 where or_id=@or_id and us_id=@us_id";
+                flag = 1;
+            }
+            bool result = DBHelper.Exec(cmd, "@or_id", or_id) > 0;
+            if (flag == 0)
+            {
+                string cmd2 = @"update [Order] set or_state=30 where or_id=@or_id and us_id=@us_id";
+                return DBHelper.Exec(cmd2, "@or_id", or_id, "@us_id", us_id) > 0;
+            }
+            return false;
         }
         /// <summary>
         /// 获取订单信息
@@ -506,6 +567,8 @@ namespace API.DAL
         ///20 完成
         ///30 被关闭
         ///31 关闭
+        ///32 拒绝申请
+        ///33 拒绝邀请
         ///40 过期
         ///
         /// <summary>
@@ -582,11 +645,47 @@ namespace API.DAL
         public static bool DisAgree(string or_id, string ods_id)
         {
             CheckAvailability();
-            string cmd = @"update [OrderDetails] set or_state=30 where or_id=@or_id and ods_id=@ods_id and or_state=10";
+            string cmd = @"update [OrderDetails] set or_state=32 where or_id=@or_id and ods_id=@ods_id and or_state=10";
             bool result = DBHelper.Exec(cmd, "@ods_id", ods_id, "@or_id", or_id) > 0;
             if (result)
                 return true;
             return false;
+        }
+        /// <summary>
+        /// 同意邀请
+        /// </summary>
+        /// <param name="ods_id">订单id</param>
+        /// <returns></returns>
+        public static bool AcceptApply(string ods_id)
+        {
+            CheckAvailability();
+            string cmd = @"update [OrderDetails] set or_state=0 where ods_id=@ods_id and or_state=15";
+            bool result = DBHelper.Exec(cmd, "@ods_id", ods_id) > 0;
+            return result;
+        }
+        /// <summary>
+        /// 拒绝邀请
+        /// </summary>
+        /// <param name="ods_id">订单id</param>
+        /// <returns></returns>
+        public static bool DisAcceptApply(string ods_id)
+        {
+            CheckAvailability();
+            string cmd = @"update [OrderDetails] set or_state=33 where ods_id=@ods_id and or_state=15";
+            bool result = DBHelper.Exec(cmd, "@ods_id", ods_id) > 0;
+            return result;
+        }
+        /// <summary>
+        /// 支付
+        /// </summary>
+        /// <param name="ods_id"></param>
+        /// <returns></returns>
+        public static bool Payfor(string ods_id)
+        {
+            CheckAvailability();
+            string cmd = @"update [OrderDetails] set ispay=1 where ods_id=@ods_id";
+            bool result = DBHelper.Exec(cmd, "@ods_id", ods_id) > 0;
+            return result;
         }
     }
 }

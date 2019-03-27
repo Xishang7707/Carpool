@@ -33,4 +33,3 @@ E:\Visual Studio 2017 Projects\Carpool\Carpool\obj\Debug\Carpool.csproj.CoreComp
 E:\Visual Studio 2017 Projects\Carpool\Carpool\obj\Debug\Carpool.csproj.CopyComplete
 E:\Visual Studio 2017 Projects\Carpool\Carpool\obj\Debug\Carpool.dll
 E:\Visual Studio 2017 Projects\Carpool\Carpool\obj\Debug\Carpool.pdb
-E:\Visual Studio 2017 Projects\Carpool\Carpool\obj\Debug\Carpool.csprojAssemblyReference.cache

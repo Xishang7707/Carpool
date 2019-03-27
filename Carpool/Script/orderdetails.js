@@ -31,7 +31,7 @@ $(function () {
         $.cookie('CarpoolSSID', '');
         $(".nav-login").removeClass('d-none');
         $(".user-menu").addClass('d-none');
-        Login_Show(logined);
+        locattion.reload();
     }
     logined();
 
@@ -57,7 +57,7 @@ $(function () {
             userinfo: '',
             applycount: '',
             car: '',
-            us_id:'',
+            us_id: '',
             distance: '',
             paytype: ['免费', '面议', '一口价'],
             cartype: ['轿车', 'MPV', 'SUV', '跑车', '客车', '其他'],
@@ -172,7 +172,9 @@ $(function () {
                 return new Date(time).format(fmt);
             },
             getchatowner: function () {
-                dialog_ok({ title: '联系方式', content: this.userinfo['name'] + ' ' + this.userinfo['tel'] });
+                if (islogin())
+                    dialog_ok({ title: '联系方式', content: this.userinfo['name'] + ' ' + this.userinfo['tel'] });
+                else Login_Show(logined);
             },
             applyorder: function (or_id) {
                 senddata({

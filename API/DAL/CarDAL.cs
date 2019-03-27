@@ -26,7 +26,7 @@ namespace API.DAL
             if (!result)
                 return false;
             string cmd2 = @"update [User] set type=1 where id=@us_id";
-            result = DBHelper.Exec(cmd, "us_id", us_id) > 0;
+            result = DBHelper.Exec(cmd2, "us_id", us_id) > 0;
             return result;
         }
         public static bool Exist(string caridcard)

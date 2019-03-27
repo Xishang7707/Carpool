@@ -250,23 +250,38 @@ namespace API.API
                         result = OrderDAL.OrderComplete(or_id, us_id);
                         if (!result)
                             return SendData(20000, "修改失败");
-                        else return SendData(200, "成功");
+                        else
+                        {
+                            return SendData(200, "成功");
+                        }
                     case "1"://关闭订单
-                             //ods_json = OrderDAL.GetOrderDetailsInfo(or_id, us_id);
-                             //if (ods_json == null || ods_json["identity"].ToString() != "1")
-                             //    return SendData(400, "请求错误");
+                        ods_json = OrderDAL.GetOrderDetailsInfo(or_id, us_id);
+                        if (ods_json == null)
+                            return SendData(400, "请求错误");
 
-                        //result = OrderDAL.OrderComplete(or_id, us_id);
-                        //if (!result)
-                        //    return SendData(20000, "修改失败");
-                        //else return SendData(200, "成功");
+                        result = OrderDAL.OrderClose(or_id, us_id);
+                        if (!result)
+                            return SendData(20000, "修改失败");
+                        else
+                        {
+                            return SendData(200, "成功");
+                        }
                         break;
                     case "2"://同意申请
                         {
                             string ods_id = data["ods_id"]?.ToString();
                             result = OrderDAL.Agree(or_id, ods_id);
                             if (result)
+                            {
+                                JObject or_json = OrderDAL.GetInfo(or_id);
+                                ods_json = OrderDAL.GetOrderDetailsInfo(ods_id);
+                                NoticeDAL.Notification(
+                                    "同意申请：" + or_json["startplace"].ToString() + " 到 " + or_json["endplace"].ToString(),
+                                    or_json["startplace"].ToString() + " 到 " + or_json["endplace"].ToString() + "的拼车订单申请已经被同意，开始时间为：" + or_json["starttime"].ToString() + " <br/>请注意时间，以免迟到。",
+                                    us_id,
+                                    ods_json["us_id"].ToString());
                                 return SendData(200);
+                            }
                             else return SendData(400, "请求错误");
                         }
                         break;
@@ -275,7 +290,52 @@ namespace API.API
                             string ods_id = data["ods_id"]?.ToString();
                             result = OrderDAL.DisAgree(or_id, ods_id);
                             if (result)
+                            {
+                                JObject or_json = OrderDAL.GetInfo(or_id);
+                                ods_json = OrderDAL.GetOrderDetailsInfo(ods_id);
+                                NoticeDAL.Notification(
+                                  "拒绝申请：" + or_json["startplace"].ToString() + " 到 " + or_json["endplace"].ToString(),
+                                  or_json["startplace"].ToString() + " 到 " + or_json["endplace"].ToString() + "的拼车订单申请已经被拒绝。",
+                                  us_id,
+                                  ods_json["us_id"].ToString());
                                 return SendData(200);
+                            }
+                            else return SendData(400, "请求错误");
+                        }
+                        break;
+                    case "4"://同意邀请
+                        {
+                            string ods_id = data["ods_id"].ToString();
+                            result = OrderDAL.AcceptApply(ods_id);
+                            if (result)
+                            {
+                                JObject or_json = OrderDAL.GetInfo(or_id);
+                                ods_json = OrderDAL.GetOrderDetailsInfo(ods_id);
+                                NoticeDAL.Notification(
+                                  "同意邀请：" + or_json["startplace"].ToString() + " 到 " + or_json["endplace"].ToString(),
+                                  or_json["startplace"].ToString() + " 到 " + or_json["endplace"].ToString() + "的拼车订单邀请已经被同意,请注意发车时间。",
+                                  us_id,
+                                  ods_json["us_id"].ToString());
+                                return SendData(200);
+                            }
+                            else return SendData(400, "请求错误");
+                        }
+                        break;
+                    case "5"://拒绝邀请
+                        {
+                            string ods_id = data["ods_id"].ToString();
+                            result = OrderDAL.AcceptApply(ods_id);
+                            if (result)
+                            {
+                                JObject or_json = OrderDAL.GetInfo(or_id);
+                                ods_json = OrderDAL.GetOrderDetailsInfo(ods_id);
+                                NoticeDAL.Notification(
+                                  "拒绝邀请：" + or_json["startplace"].ToString() + " 到 " + or_json["endplace"].ToString(),
+                                  or_json["startplace"].ToString() + " 到 " + or_json["endplace"].ToString() + "的拼车订单邀请已经被拒绝。",
+                                  us_id,
+                                  ods_json["us_id"].ToString());
+                                return SendData(200);
+                            }
                             else return SendData(400, "请求错误");
                         }
                         break;
@@ -444,6 +504,12 @@ namespace API.API
                 if (!result)
                     return SendData(20000, "服务错误");
 
+                JObject us_json = UserDAL.GetInfo(us_id);
+                NoticeDAL.Notification(
+                                  "申请加入：" + or_json["startplace"].ToString() + " 到 " + or_json["endplace"].ToString(),
+                                  "订单id：" + or_id + "<br/>乘客：" + us_json["name"].ToString() + "，申请加入" + or_json["startplace"].ToString() + " 到 " + or_json["endplace"].ToString() + "的拼车",
+                                  us_id,
+                                  or_json["us_id"].ToString());
                 return SendData(200);
             }
             catch (Exception e)
@@ -489,11 +555,21 @@ namespace API.API
                 if (OrderDAL.IsInvate(or_id, us_id))
                     return SendData(17004, "已经申请/加入");
 
-                bool result = OrderDAL.ApplyOrder(or_id, us_id);
+                bool result = OrderDAL.InviteOrder(or_id, us_id);
 
                 if (!result)
                     return SendData(20000, "服务错误");
+                JObject nt_json = new JObject();
+                nt_json.Add("type", 3);
+                nt_json.Add("title", "拼车邀请：" + or_json["startplace"] + " 到 " + or_json["endplace"]);
+                nt_json.Add("content", or_json);
 
+                JObject us_json = UserDAL.GetInfo(us_id);
+                NoticeDAL.Notification(
+                                  "邀请加入：" + or_json["startplace"].ToString() + " 到 " + or_json["endplace"].ToString(),
+                                  "订单id：" + or_id + "<br/>司机：" + us_json["name"].ToString() + "，邀请加入" + or_json["startplace"].ToString() + " 到 " + or_json["endplace"].ToString() + "的拼车",
+                                  us_id,
+                                  or_json["us_id"].ToString());
                 return SendData(200);
             }
             catch (Exception e)
@@ -531,6 +607,33 @@ namespace API.API
                         return SendData(400, "请求错误");
                 }
                 return SendData(200, data: result ? 1 : 0);
+            }
+            catch (Exception e)
+            {
+                return SendData(400, "请求错误");
+            }
+        }
+
+        [HttpPost]
+        public JObject Payfor(dynamic in_data)
+        {
+            try
+            {
+                JObject data = JObject.Parse(in_data.ToString());
+                string us_id = data["CarpoolSSID"].ToString();
+                string ods_id = data["ods_id"].ToString();
+                string option = data["option"].ToString();
+
+                if (us_id == null || Session["CarpoolSSID"]?.ToString() != us_id)
+                    return SendData(15001, "未授权访问");
+                if (ods_id == null || ods_id == "")
+                    return SendData(400, "请求错误");
+
+                bool result = OrderDAL.Payfor(ods_id);
+                if (result)
+                    return SendData(200);
+                else
+                    return SendData(20000, "服务错误");
             }
             catch (Exception e)
             {

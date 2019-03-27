@@ -21,10 +21,10 @@ function alert_success_tip(el, info, sec = 3000) {
     }, sec)
 }
 
-function alert_info_tip(el, info, sec = 3000) {
-    var elem = $('<div class="container-fluid fixed-top"><div class="row p-0 d-flex flex-wrap justify-content-center"><div class="col-md-6 p-2"><div class="alert tip alert-info alert-dismissible fade show"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>提示!</strong>' + info + '</div></div></div></div>');
-    el.prepend(elem);
-
+function alert_info_tip(info, sec = 3000, click) {
+    var elem = $('<div class="container-fluid fixed-top" style="z-index:5000;margin-top:56px;"><div class="row p-0 d-flex flex-wrap justify-content-center"><div class="col-md-6 p-2"><div class="alert tip alert-info alert-dismissible fade show"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>提示!</strong>' + info + '</div></div></div></div>');
+    $(document.body).prepend(elem);
+    elem.find(".info").click(click);
     setTimeout(() => {
         $(".alert.tip").alert('close');
         elem.remove();
@@ -32,7 +32,7 @@ function alert_info_tip(el, info, sec = 3000) {
 }
 
 function alert_error_tip(el, info, sec = 3000) {
-    var elem = $('<div class="container-fluid fixed-top"><div class="row p-0 d-flex flex-wrap justify-content-center"><div class="col-md-6 p-2"><div class="alert tip alert-danger alert-dismissible fade show"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>错误!</strong>' + info + '</div></div></div></div>');
+    var elem = $('<div class="container-fluid fixed-top" style="z-index:5000"><div class="row p-0 d-flex flex-wrap justify-content-center"><div class="col-md-6 p-2"><div class="alert tip alert-danger alert-dismissible fade show"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>错误!</strong>' + info + '</div></div></div></div>');
     el.prepend(elem);
 
     setTimeout(() => {

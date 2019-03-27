@@ -64,13 +64,13 @@ namespace API.API
                     return SendData(17001, "车牌号码已被注册");
 
                 if (!CarDAL.Apply(us_id, carname, caridcard, capacity, cartype))
-                    return SendData(400, "请求错误");
+                    return SendData(20000, "服务错误");
 
                 return SendData(200);
             }
             catch (Exception e)
             {
-                return SendData(400, "请求错误");
+                return SendData(400, "请求错误", e.ToString());
             }
         }
     }

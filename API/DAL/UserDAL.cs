@@ -87,5 +87,30 @@ namespace API.DAL
             int result = DBHelper.Exec(cmd, "@password", password, "@id", us_id);
             return result > 0;
         }
+        /// <summary>
+        /// 身份证是否被注册
+        /// </summary>
+        /// <param name="idcard">身份证</param>
+        /// <returns></returns>
+        public static bool HasVerified(string idcard)
+        {
+            string cmd = @"select * from [User] where idcard=@idcard";
+            JArray us_jarr = DBHelper.GetData(cmd, "@idcard", idcard);
+            if (us_jarr.Count > 0)
+                return true;
+            return false;
+        }
+        /// <summary>
+        /// 实名认证
+        /// </summary>
+        /// <param name="us_id">用户id</param>
+        /// <param name="name">姓名</param>
+        /// <param name="idcard">身份证号</param>
+        /// <returns></returns>
+        public static bool Verified(string us_id, string name, string idcard)
+        {
+            string cmd = @"update [User] set name=@name, idcard=@idcard where id=@us_id";
+            return DBHelper.Exec(cmd, "@name", name, "@idcard", idcard, "@us_id", us_id) > 0;
+        }
     }
 }

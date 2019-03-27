@@ -12,8 +12,8 @@
         content +
         '</div>' +
         '<div class="modal-footer">' +
-        '<button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal">取消</button>' +
-        '<button type="button" class="btn btn-primary btn-ok" data-dismiss="modal">确定</button>' +
+        '<button type="button" class="btn btn-secondary btn-cancel" @click="cancel" data-dismiss="modal">取消</button>' +
+        '<button type="button" class="btn btn-primary btn-ok" @click="ok" data-dismiss="modal">确定</button>' +
         '</div>' +
         '</div>' +
         '</div>' +
@@ -60,7 +60,7 @@ function dialog_ok({ title, content, ok_call }) {
         content +
         '</div>' +
         '<div class="modal-footer">' +
-        '<button type="button" class="btn btn-primary btn-ok" data-dismiss="modal">确定</button>' +
+        '<button type="button" class="btn btn-primary btn-ok"  @click="ok" data-dismiss="modal">确定</button>' +
         '</div>' +
         '</div>' +
         '</div>' +
